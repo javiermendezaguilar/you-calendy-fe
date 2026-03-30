@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+
+:root {
+  font-family: "Outfit", sans-serif;
+}
+
+* {
+  font-family: "Outfit", sans-serif !important;
+}
+
+body {
+  font-family: "Outfit", sans-serif !important;
+}
+
+.fc-v-event {
+  border: none;
+  background-color: transparent;
+  width: auto;
+}
+.fc-v-event .fc-event-main {
+  width: 250px;
+}
+/* .mantine-YearPickerInput-input,
+.mantine-DateInput-input {
+  background-color: #0d0d0d !important;
+  border: 1px solid #0d0d0d !important;
+  color: #fff !important;
+} */
+
+/* Pagination styling */
+.pagination-control {
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.pagination-control[data-active] {
+  background-color: #738B4A !important;
+  border-color: #738B4A !important;
+  color: white !important;
+  font-weight: 700 !important;
+}
+
+/* Target all control elements with arrows */
+.mantine-Pagination-control[data-control],
+.pagination-control[data-control] {
+  background-color: #738B4A !important;
+  border-color: #738B4A !important;
+  color: white !important;
+}
+
+.mantine-Pagination-control[data-control]:hover:not([data-disabled]),
+.pagination-control[data-control]:hover:not([data-disabled]) {
+  background-color: #6A8838 !important;
+}
+
+/* Legacy selectors for backward compatibility */
+.mantine-Pagination-control:first-child,
+.mantine-Pagination-control:last-child,
+.mantine-Pagination-control:nth-child(2),
+.mantine-Pagination-control:nth-last-child(2) {
+  background-color: #738B4A !important;
+  border-color: #738B4A !important;
+  color: white !important;
+}
+
+.mantine-Pagination-control:first-child:hover:not([data-disabled]),
+.mantine-Pagination-control:last-child:hover:not([data-disabled]),
+.mantine-Pagination-control:nth-child(2):hover:not([data-disabled]),
+.mantine-Pagination-control:nth-last-child(2):hover:not([data-disabled]) {
+  background-color: #6A8838 !important;
+}
+
+/* Specific barber pagination styling */
+.barber-pagination .mantine-Pagination-control {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barber-pagination .mantine-Pagination-control[data-dots],
+.barber-pagination .mantine-Pagination-control[data-active] {
+  width: 28px;
+  height: 28px;
+}
+
+.barber-pagination .mantine-Pagination-control:first-child,
+.barber-pagination .mantine-Pagination-control:last-child,
+.barber-pagination .mantine-Pagination-control:nth-child(2),
+.barber-pagination .mantine-Pagination-control:nth-last-child(2) {
+  background-color: #738B4A !important;
+  border-color: #738B4A !important;
+  color: white !important;
+}
+
+/* Make sure the SVG icons inside controls are white */
+.barber-pagination .mantine-Pagination-control:first-child svg,
+.barber-pagination .mantine-Pagination-control:last-child svg,
+.barber-pagination .mantine-Pagination-control:nth-child(2) svg,
+.barber-pagination .mantine-Pagination-control:nth-last-child(2) svg {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
+}
