@@ -190,8 +190,8 @@ const ProfileImages = () => {
     const publicUrl = businessData?.data?.contactInfo?.publicUrl;
     
     if (publicUrl) {
-      // Open the public barber profile in a new tab
-      const profileUrl = `https://you-calendy-fe-pi.vercel.app/barber/profile/${publicUrl}`;
+      // Build the preview URL from the current frontend origin to avoid stale deploy URLs.
+      const profileUrl = `${window.location.origin}/barber/profile/${publicUrl}`;
       window.open(profileUrl, '_blank', 'noopener,noreferrer');
     } else {
       toast.error('Public URL not found. Please set up your public profile URL first.');
