@@ -155,7 +155,7 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
       };
 
       // Use the public client creation endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/business/client-profiles`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/business/client-profiles`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

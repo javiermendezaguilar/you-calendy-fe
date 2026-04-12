@@ -47,7 +47,8 @@ const Booking = () => {
         src={booking}
         alt="Hero background"
         className="absolute h-full w-full object-cover inset-0"
-        loading="eager"
+        loading="lazy"
+        decoding="async"
         aria-hidden="true"
       />
       <Container className="relative flex w-full flex-col items-center max-md:max-w-full">

@@ -12,7 +12,7 @@ const penaltyService = {
    */
   addPenalty: async (clientId, penaltyData) => {
     try {
-      console.log(`Adding penalty for client ${clientId}:`, penaltyData);
+      console.log('Adding penalty for client', { clientId, penaltyData });
       
       return {
         success: true,
@@ -44,7 +44,7 @@ const penaltyService = {
    */
   markPenaltyAsPaid: async (penaltyId) => {
     try {
-      console.log(`Marking penalty ${penaltyId} as paid`);
+      console.log('Marking penalty as paid', { penaltyId });
       
       return {
         success: true,
@@ -72,7 +72,7 @@ const penaltyService = {
    */
   getClientPenalties: async (clientId) => {
     try {
-      console.log(`Getting penalties for client ${clientId}`);
+      console.log('Getting penalties for client', { clientId });
       
       const mockPenalties = [
         {

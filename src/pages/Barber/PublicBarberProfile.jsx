@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@mantine/core';
@@ -12,9 +12,10 @@ import Gallery from './Gallery';
 import Header from './Header';
 import ClientProfile from './ClientProfile';
 import Footer from '../../components/home/landing/Footer';
-import SignInModal from './SignInModal';
-import SignUpModal from './SignUpModal';
-import ForgotPasswordModal from './ForgotPasswordModal';
+
+const SignInModal = lazy(() => import('./SignInModal'));
+const SignUpModal = lazy(() => import('./SignUpModal'));
+const ForgotPasswordModal = lazy(() => import('./ForgotPasswordModal'));
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -292,29 +293,41 @@ const PublicBarberProfile = () => {
       </div>
       
       {/* Authentication Modals */}
-      <SignInModal
-        show={showSignInModal}
-        onClose={closeSignInModal}
-        onSignInSuccess={handleSignInSuccess}
-        onSwitchToSignUp={handleSwitchToSignUp}
-        onSwitchToForgotPassword={handleSwitchToForgotPassword}
-        service={null}
-      />
+      {showSignInModal ? (
+        <Suspense fallback={null}>
+          <SignInModal
+            show={showSignInModal}
+            onClose={closeSignInModal}
+            onSignInSuccess={handleSignInSuccess}
+            onSwitchToSignUp={handleSwitchToSignUp}
+            onSwitchToForgotPassword={handleSwitchToForgotPassword}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
       
-      <SignUpModal
-        show={showSignUpModal}
-        onClose={closeSignUpModal}
-        onSignUpSuccess={handleSignUpSuccess}
-        onSwitchToSignIn={handleSwitchToSignIn}
-        service={null}
-      />
+      {showSignUpModal ? (
+        <Suspense fallback={null}>
+          <SignUpModal
+            show={showSignUpModal}
+            onClose={closeSignUpModal}
+            onSignUpSuccess={handleSignUpSuccess}
+            onSwitchToSignIn={handleSwitchToSignIn}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
       
-      <ForgotPasswordModal
-        show={showForgotPasswordModal}
-        onClose={closeForgotPasswordModal}
-        onBackToSignIn={handleSwitchToSignIn}
-        service={null}
-      />
+      {showForgotPasswordModal ? (
+        <Suspense fallback={null}>
+          <ForgotPasswordModal
+            show={showForgotPasswordModal}
+            onClose={closeForgotPasswordModal}
+            onBackToSignIn={handleSwitchToSignIn}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
     </BatchTranslationLoader>
   );
 };

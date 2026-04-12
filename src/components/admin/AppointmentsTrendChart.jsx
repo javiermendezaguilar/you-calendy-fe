@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React, { useMemo } from 'react';
 import { AppointmentsTrendIcon } from '../common/Svgs';
 import { FaCalendarAlt } from 'react-icons/fa';
 import { useAdminAppointmentTrends } from '../../hooks/useAdmin';
 import { Skeleton } from '@mantine/core';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import i18n from '../../i18n';
+import SimpleVerticalBarChart from '../common/charts/SimpleVerticalBarChart';
 
 const ChartSkeleton = () => (
     <div className="h-[350px] w-full flex items-end gap-2 p-4">
@@ -32,76 +32,17 @@ const AppointmentsTrendChart = ({ isLoading: isDashboardLoading }) => {
 
     const formattedDate = new Date().toLocaleDateString(i18n.language, { day: '2-digit', month: 'long', year: 'numeric' });
 
-    const series = useMemo(() => {
+    const chartData = useMemo(() => {
         if (isLoading || error || !trendsData?.data?.monthlyCounts) {
-            return [{ name: tc('appointments'), data: [] }];
+            return [];
         }
-        const appointmentData = trendsData.data.monthlyCounts.map(item => item.count || 0);
-        return [{
-            name: tc('appointments'),
-            data: appointmentData,
-        }];
+
+        const labels = [tc('jan'), tc('feb'), tc('mar'), tc('apr'), tc('may'), tc('jun'), tc('jul'), tc('aug'), tc('sep'), tc('oct'), tc('nov'), tc('dec')];
+        return labels.map((label, index) => ({
+            label,
+            value: trendsData.data.monthlyCounts[index]?.count || 0,
+        }));
     }, [trendsData, isLoading, error, tc]);
-
-    const options = useMemo(() => ({
-        chart: {
-            type: 'bar',
-            height: 350,
-            toolbar: { show: false },
-            fontFamily: 'sans-serif',
-        },
-        plotOptions: {
-            bar: {
-                borderRadius: 8,
-                horizontal: false,
-                columnWidth: '80%',
-            },
-        },
-        dataLabels: { enabled: false },
-        stroke: { show: true, width: 2, colors: ['transparent'] },
-        xaxis: {
-            categories: [tc('jan'), tc('feb'), tc('mar'), tc('apr'), tc('may'), tc('jun'), tc('jul'), tc('aug'), tc('sep'), tc('oct'), tc('nov'), tc('dec')],
-            axisBorder: { show: true, color: '#9CA3AF', strokeDashArray: 4 },
-            axisTicks: { show: true },
-            labels: { style: { colors: '#6c757d', fontSize: '12px' } },
-        },
-        yaxis: {
-            min: 0,
-            labels: {
-                style: { colors: '#6c757d', fontSize: '12px' },
-                formatter: function (val) { return val.toFixed(0); }
-            },
-            tickAmount: 4,
-            axisBorder: { show: true, color: '#9CA3AF', strokeDashArray: 4 },
-            axisTicks: { show: true },
-        },
-        fill: { opacity: 1, colors: ['#6366F1'] },
-        tooltip: {
-            x: { show: true },
-            y: {
-                formatter: function (val) { return val; },
-                title: { formatter: function () { return tc('appointments') + ':'; } }
-            },
-            marker: { show: false },
-        },
-        grid: {
-            borderColor: '#D1D5DB',
-            strokeDashArray: 4,
-            position: 'back',
-            yaxis: { lines: { show: true } },
-            xaxis: { lines: { show: false } }
-        },
-        annotations: {
-            xaxis: [
-                { x: tc('feb'), fillColor: '#EBE5FC', borderColor: 'transparent', opacity: 0.6 }
-            ]
-        },
-        states: {
-            hover: { filter: { type: 'darken', value: 0.95 } },
-            active: { filter: { type: 'none', value: 0 } }
-        }
-    }), [tc]);
-
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-md mt-6">
@@ -122,14 +63,17 @@ const AppointmentsTrendChart = ({ isLoading: isDashboardLoading }) => {
                     <div className="flex justify-center items-center h-[350px] text-red-500">
                         {tc('failedToLoadAppointmentTrends')}
                     </div>
-                ) : (series[0].data.length === 0) ? (
+                ) : (chartData.length === 0) ? (
                     <div className="flex justify-center items-center h-[350px] text-gray-500">
                         {tc('noAppointmentDataAvailableYet')}
                     </div>
                 ) : (
-                    <div id="chart">
-                        <ReactApexChart options={options} series={series} type="bar" height={350} />
-                    </div>
+                    <SimpleVerticalBarChart
+                        data={chartData}
+                        height={350}
+                        color="#6366F1"
+                        emptyLabel={tc('noAppointmentDataAvailableYet')}
+                    />
                 )}
             </div>
         </div>

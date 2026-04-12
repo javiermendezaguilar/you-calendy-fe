@@ -5,7 +5,7 @@ import HeroRibbon from "../../../assets/hero-ribbon.png";
 import HeroCandy from "../../../assets/hero-candy.png";
 import HeroBarbar from "../../../assets/hero-barber.webp";
 import { FaArrowRightLong } from "react-icons/fa6";
-import HeroBG from "../../../assets/HeroBG.png";
+import HeroBG from "../../../assets/hero-bg.webp";
 import { motion } from "framer-motion";
 
 const containerVariants = {
@@ -48,11 +48,11 @@ const HeroSection = () => {
         <motion.p variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl flex gap-2 md:gap-4">
           Grow Your{" "}
           <span>
-            <img src={HeroCandy} className="w-3 md:w-4" />
+            <img src={HeroCandy} alt="" className="w-3 md:w-4" decoding="async" />
           </span>
         </motion.p>
         <motion.p variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl font-semibold">Barber Business</motion.p>
-        <motion.img variants={itemVariants} src={HeroRibbon} className="w-full md:w-4/5" />
+        <motion.img variants={itemVariants} src={HeroRibbon} alt="" className="w-full md:w-4/5" decoding="async" />
         <motion.p variants={itemVariants} className="my-4 md:my-6 text-md">
           Simplify bookings, manage clients, track earnings, and attract more
           customers—all in one powerful and easy-to-use app.
@@ -79,7 +79,14 @@ const HeroSection = () => {
         initial="hidden"
         animate="visible"
       >
-        <img src={HeroBarbar} className="w-5/6"/>
+        <img
+          src={HeroBarbar}
+          alt="Barber using Groomnest"
+          className="w-5/6"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
       </motion.div>
     </div>
   );

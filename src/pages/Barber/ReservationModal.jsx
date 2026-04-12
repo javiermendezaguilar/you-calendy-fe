@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, Upload, Mail, Plus } from 'lucide-react';
-import { Calendar, USFlagIcon, GoogleIcon, FacebookIcon } from '../../components/common/Svgs';
-import { Button, TextInput, Checkbox, Textarea, Group, Box } from '@mantine/core';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Button, Textarea } from '@mantine/core';
 import CommonModal from '../../components/common/CommonModal';
 import { UploadIcon } from '../../components/common/Svgs';
 import { toast } from 'sonner';
 import { DatePicker } from '@mantine/dates';
-import { Calendar as CalendarIcon } from 'lucide-react';
 import { useGetAvailableSlots } from '../../hooks/useAppointments';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import { useGetActiveFlashSales, useGetActivePromotions } from '../../hooks/useMarketing';
-import { useMemo } from 'react';
-import { clientAPI } from '../../services/clientAPI';
+import { clientAPI, clientLogin } from '../../services/clientAPI';
 
 // Day names will be translated using tc() function in the component
 // daysOfWeekData removed as it's not used in the component
@@ -486,7 +483,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
   }, [selectedDate]);
 
   // Calculate discount based on flash sale or happy hour
-  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace('$', '')) : parseFloat(service.price)) : 15.00;
+  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace(/\$/g, '')) : parseFloat(service.price)) : 15.00;
   
   const discountInfo = useMemo(() => {
     // Early return if required data is missing
@@ -696,7 +693,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
               
               // Since we don't have an invitation token, we'll try a different approach
               // Use the client endpoint that might create a client in the context of a business
-              const clientResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/api/client/complete-profile`, {
+              const clientResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/api/client/complete-profile`, {
                 method: 'POST',
                 credentials: 'include', // Important: Include cookies to receive clientToken cookie
                 body: clientFormData
@@ -729,7 +726,6 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                 
                 // Ensure client is logged in to get the cookie (if not already set by complete-profile)
                 try {
-                  const { clientLogin } = await import('../../services/clientAPI');
                   await clientLogin(clientId);
                 } catch (loginError) {
                   // Continue anyway - cookie might already be set from complete-profile
@@ -789,7 +785,6 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         // Ensure client is logged in to get the cookie before booking
         if (clientId) {
           try {
-            const { clientLogin } = await import('../../services/clientAPI');
             await clientLogin(clientId);
           } catch (loginError) {
             // Continue anyway - cookie might already be set
@@ -813,7 +808,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         } else if (!clientJustCreated) {
           // For existing clients, check their appointment history
           try {
-            const checkResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments?limit=1&_t=${Date.now()}`, {
+            const checkResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments?limit=1&_t=${Date.now()}`, {
               method: 'GET',
               credentials: 'include',
               cache: 'no-cache',
@@ -846,7 +841,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         }
         
         // Use the regular appointments endpoint with cookie-based authentication
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments`, {
           method: 'POST',
           credentials: 'include', // Important: Include cookies (clientToken) in the request
           body: formData
@@ -862,7 +857,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
           // This is the most reliable way to determine if this was the first appointment
           setTimeout(async () => {
             try {
-              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments?limit=2&_t=${Date.now()}`, {
+              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments?limit=2&_t=${Date.now()}`, {
                 method: 'GET',
                 credentials: 'include',
                 cache: 'no-cache',

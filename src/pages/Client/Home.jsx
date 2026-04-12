@@ -1,35 +1,22 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { ChevronDown, Search, Share2, ArrowLeft, ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
+import { ChevronDown, Search, ArrowLeft, ArrowRight } from 'lucide-react';
 import barber from "../../assets/barber.webp"
 import customer from "../../assets/customer.webp"
 import { FooterInstagramIcon, FooterFacebookIcon, FooterTwitterIcon, ShareIcon } from '../../components/common/Svgs';
 import Checky from "../../assets/checky.png"
-import ReservationModal from './ReservationModal';
 import { SendIcon } from '../../components/common/Svgs';
 import { Button, TextInput, ActionIcon, Skeleton } from '@mantine/core';
 import { Carousel } from '@mantine/carousel';
 import '@mantine/carousel/styles.css';
-import background from "../../assets/bg.png"
+import background from "../../assets/background.webp"
 import { motion, AnimatePresence } from 'framer-motion';
 import { getBusinessById, getBusinessServices, getBusinessHours, getBusinessStaff, getBusinessGallery, getClientByInvitationToken, getStaffWorkingHoursClientSide } from '../../services/businessPublicAPI';
 import { getCurrentBusinessId, getInvitationToken, processInvitationFromUrl, storeStaffId, storeClientData, getCurrentStaffId, getClientData } from '../../utils/invitationUtils';
 import { toast } from 'sonner';
-import { MapContainer, TileLayer, Marker, ZoomControl } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
-import 'leaflet-defaulticon-compatibility';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 
-// Custom marker icon for the business location
-const customIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-  shadowSize: [41, 41]
-});
+const ReservationModal = lazy(() => import('./ReservationModal'));
+const BusinessMap = lazy(() => import('../../components/client/BusinessMap'));
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -516,38 +503,6 @@ export const Home = () => {
     return [];
   };
 
-  // Business Map Component
-  const BusinessMap = ({ coordinates }) => {
-    // Ensure coordinates are valid
-    const validCoordinates = coordinates && Array.isArray(coordinates) && coordinates.length === 2 
-      ? coordinates 
-      : [37.7749, -122.4194]; // Default to San Francisco
-
-    return (
-      <div className="relative w-full h-full">
-        <MapContainer 
-          center={validCoordinates} 
-          zoom={15} 
-          style={{ height: '100%', width: '100%', zIndex: 0 }}
-          zoomControl={false}
-          dragging={false}
-          touchZoom={false}
-          doubleClickZoom={false}
-          scrollWheelZoom={false}
-          boxZoom={false}
-          keyboard={false}
-          attributionControl={false}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <Marker position={validCoordinates} icon={customIcon} />
-        </MapContainer>
-      </div>
-    );
-  };
-
   const handleReserveClick = (service) => {
     if (!isServiceAssignedToAnyStaff(service)) {
       toast.error(notAssignedLabel);
@@ -717,7 +672,9 @@ export const Home = () => {
                 <div className="relative h-[300px] sm:h-[320px] md:h-[340px] lg:h-[360px]">
                   <div className="absolute w-full h-[180px] sm:h-[190px] md:h-[200px] lg:h-[220px] top-0 left-0 z-0">
                     <div className="w-full h-full relative">
-                      <BusinessMap coordinates={getBusinessCoordinates()} />
+                      <Suspense fallback={<div className="w-full h-full bg-gray-100 animate-pulse rounded-lg" />}>
+                        <BusinessMap coordinates={getBusinessCoordinates()} />
+                      </Suspense>
                     </div>
                     
                     <div className="absolute w-[95%] h-[70px] sm:h-[75px] md:h-[80px] lg:h-20 top-[110px] sm:top-[115px] md:top-[120px] lg:top-[124px] left-[2.5%] bg-white rounded-xl border border-solid border-[#cccccc] shadow-[0px_28px_12px_-24px_#0000001f] z-10">
@@ -1121,13 +1078,17 @@ export const Home = () => {
         </div>
       </div>
       
-      <ReservationModal 
-        show={showModal} 
-        onClose={closeModal} 
-        service={selectedService} 
-        selectedStaffInfo={assignedStaff}
-        timeFormatPreference={preferredTimeFormat}
-      />
+      {showModal ? (
+        <Suspense fallback={null}>
+          <ReservationModal 
+            show={showModal} 
+            onClose={closeModal} 
+            service={selectedService} 
+            selectedStaffInfo={assignedStaff}
+            timeFormatPreference={preferredTimeFormat}
+          />
+        </Suspense>
+      ) : null}
       
     </motion.div>
   );

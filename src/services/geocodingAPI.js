@@ -768,7 +768,7 @@ const searchWithMultipleAPIs = async (query, limit = 8) => {
     return results;
     
   } catch (error) {
-    console.error(`Error with ${selectedAPI}:`, error);
+    console.error('Geocoding API error', { api: selectedAPI, error });
     updateAPIPerformance(selectedAPI, Date.now() - startTime, false);
     
     // Try fallback APIs
@@ -781,7 +781,10 @@ const searchWithMultipleAPIs = async (query, limit = 8) => {
           return results;
         }
       } catch (fallbackError) {
-        console.error(`Fallback API ${api} failed:`, fallbackError);
+        console.error('Fallback geocoding API failed', {
+          api,
+          error: fallbackError,
+        });
         updateAPIPerformance(api, Date.now() - startTime, false);
       }
     }

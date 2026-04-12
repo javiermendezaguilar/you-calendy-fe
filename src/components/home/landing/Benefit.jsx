@@ -15,7 +15,7 @@ import frame3 from "../../../assets/frame3.png";
 import frame4 from "../../../assets/frame4.png";
 import frame5 from "../../../assets/frame5.png";
 import frame6 from "../../../assets/frame6.png";
-import bg2 from "../../../assets/bg2.png";
+import bg2 from "../../../assets/keybenefits-bg.webp";
 import { motion } from "framer-motion";
 
 const benefits = [
@@ -168,6 +168,8 @@ function Benefits() {
                       width={40}
                       height={40}
                       fit="contain"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 </Card.Section>

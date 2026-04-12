@@ -4,7 +4,7 @@ import CommonModal from "../../components/common/CommonModal";
 import { ReplyIcon, UploadImageIcon } from "../../components/common/Svgs";
 import { AiOutlinePlus, AiOutlineEdit } from "react-icons/ai";
 import customer from "../../assets/customer.webp"
-import bg from "../../assets/bg.png"
+import bg from "../../assets/background.webp"
 import { useForm } from '@mantine/form';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 

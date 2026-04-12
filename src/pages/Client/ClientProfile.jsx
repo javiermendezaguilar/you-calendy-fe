@@ -17,8 +17,8 @@ import {
   useDeleteClientProfile
 } from '../../hooks/useClientProfile'
 import { getClientByInvitationToken } from '../../services/clientAPI'
-import haircut1 from '../../assets/haircut1.png'
-import bg from '../../assets/backbg.png'
+import haircut1 from '../../assets/haircut.webp'
+import bg from '../../assets/background.webp'
 
 const containerVariants = {
   hidden: { opacity: 0 },

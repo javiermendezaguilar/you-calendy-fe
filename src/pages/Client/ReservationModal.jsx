@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, Upload, Mail, Plus } from 'lucide-react';
-import { Calendar, USFlagIcon, GoogleIcon, FacebookIcon } from '../../components/common/Svgs';
-import { Button, TextInput, Checkbox, Textarea, Group, Box } from '@mantine/core';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Button, Textarea } from '@mantine/core';
 import CommonModal from '../../components/common/CommonModal';
 import { UploadIcon } from '../../components/common/Svgs';
-import { signInWithGoogle, signInWithFacebook } from '../../configs/firebase.config';
 import { toast } from 'sonner';
 import { DatePicker } from '@mantine/dates';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { completeClientProfile, getClientByInvitationToken, clientLogin, clientAPI } from '../../services/clientAPI';
+import { getClientByInvitationToken, clientLogin, clientAPI } from '../../services/clientAPI';
 import { getBusinessById } from '../../services/businessPublicAPI';
 import { createClientAppointment } from '../../services/appointmentAPI';
 import { useGetAvailableSlots } from '../../hooks/useAppointments';
-import { getInvitationToken, clearInvitationToken, getCurrentBusinessId, getClientData, storeBusinessId } from '../../utils/invitationUtils';
+import { getInvitationToken, getCurrentBusinessId, getClientData, storeBusinessId } from '../../utils/invitationUtils';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import { useGetActiveFlashSales, useGetActivePromotions } from '../../hooks/useMarketing';
 
@@ -545,7 +542,7 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
   }, [selectedDate]);
 
   // Calculate discount based on flash sale or happy hour
-  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace('$', '')) : parseFloat(service.price)) : 15.00;
+  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace(/\$/g, '')) : parseFloat(service.price)) : 15.00;
   
   const discountInfo = useMemo(() => {
     // Early return if required data is missing

@@ -5,7 +5,40 @@
       "has": [
         {
           "type": "host",
+          "value": "app.groomnest.com"
+        }
+      ],
+      "destination": "https://groomnest.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
           "value": "www.groomnest.com"
+        }
+      ],
+      "destination": "https://groomnest.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "you-calendy-fe-three.vercel.app"
+        }
+      ],
+      "destination": "https://groomnest.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "you-calendy-fe-pi.vercel.app"
         }
       ],
       "destination": "https://groomnest.com/:path*",

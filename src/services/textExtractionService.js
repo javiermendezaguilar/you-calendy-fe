@@ -220,22 +220,21 @@ class TextExtractionService {
    */
   async extractFromTranslationKeys() {
     try {
-      // Import the translation keys dynamically
-      const module = await import('../contexts/BatchTranslationContext.jsx');
+      const catalog = window.__batchTranslationCatalog;
       
       // Access the TRANSLATION_KEYS if exported
-      if (module.TRANSLATION_KEYS) {
-        Object.values(module.TRANSLATION_KEYS).forEach(text => {
+      if (catalog?.TRANSLATION_KEYS) {
+        Object.values(catalog.TRANSLATION_KEYS).forEach(text => {
           if (text && this.isTranslatableText(text)) {
             this.addExtractedText(text, 'translation-key');
           }
         });
-        // console.log(`Extracted ${Object.keys(module.TRANSLATION_KEYS).length} translation keys`);
+        // console.log(`Extracted ${Object.keys(catalog.TRANSLATION_KEYS).length} translation keys`);
       }
       
       // Also extract from COMMON_TEXTS if available
-      if (module.COMMON_TEXTS) {
-        module.COMMON_TEXTS.forEach(text => {
+      if (catalog?.COMMON_TEXTS) {
+        catalog.COMMON_TEXTS.forEach(text => {
           if (text && this.isTranslatableText(text)) {
             this.addExtractedText(text, 'common-text');
           }

@@ -7,6 +7,7 @@ import BatchLanguageSelector from "../../components/barber/BatchLanguageSelector
 import { useClientProfile } from "../../hooks/useClientProfile";
 import { Skeleton } from "@mantine/core";
 import { toast } from "sonner";
+import { clientLogin } from "../../services/clientAPI";
 
 const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
   const navigate = useNavigate();
@@ -120,11 +121,10 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
         return false;
       }
 
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
       
       // Try to login first to get cookie
       try {
-        const { clientLogin } = await import('../../services/clientAPI');
         await clientLogin(clientId);
       } catch (loginError) {
         // Continue anyway - might already be logged in

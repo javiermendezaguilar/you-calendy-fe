@@ -1,14 +1,12 @@
-import Papa from 'papaparse';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-
 /**
  * Export dashboard statistics to CSV format
  * @param {Object} data - The dashboard data to export
  * @param {string} filename - The filename for the exported file
  */
-export const exportToCSV = (data, filename = 'admin-dashboard-stats') => {
+export const exportToCSV = async (data, filename = 'admin-dashboard-stats') => {
   try {
+    const { default: Papa } = await import('papaparse');
+
     // Prepare the data for CSV export
     const csvData = [
       {
@@ -80,6 +78,11 @@ export const exportToCSV = (data, filename = 'admin-dashboard-stats') => {
  */
 export const exportToPDF = async (data, filename = 'admin-dashboard-stats') => {
   try {
+    const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+      import('jspdf'),
+      import('html2canvas'),
+    ]);
+
     // Create a new jsPDF instance
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();

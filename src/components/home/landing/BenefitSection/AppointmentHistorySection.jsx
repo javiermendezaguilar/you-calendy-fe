@@ -10,10 +10,8 @@ import {
   Rating,
 } from "@mantine/core";
 import { IconDiamond } from "@tabler/icons-react";
-import profileImage from "../../../../assets/profile-image.png";
-import haircut1 from "../../../../assets/cut1.png";
-import haircut2 from "../../../../assets/cut2.png";
-import haircut3 from "../../../../assets/cut3.png";
+import profileImage from "../../../../assets/customer.webp";
+import haircutPlaceholder from "../../../../assets/haircut.webp";
 import { motion } from "framer-motion";
 
 const appointmentsData = [
@@ -24,7 +22,7 @@ const appointmentsData = [
     avatar: profileImage,
     notes: "Client prefers a classic cut. No special requirements.",
     rating: 4.5,
-    haircutImages: [haircut1, haircut2, haircut3],
+    haircutImages: [haircutPlaceholder, haircutPlaceholder, haircutPlaceholder],
   },
   {
     id: "002",
@@ -33,7 +31,7 @@ const appointmentsData = [
     avatar: profileImage,
     notes: "Client prefers a classic cut. No special requirements.",
     rating: 5,
-    haircutImages: [haircut1, haircut2, haircut3],
+    haircutImages: [haircutPlaceholder, haircutPlaceholder, haircutPlaceholder],
   },
   {
     id: "003",
@@ -42,7 +40,7 @@ const appointmentsData = [
     avatar: profileImage,
     notes: "Loves to talk about movies. Mention the latest blockbuster.",
     rating: 4,
-    haircutImages: [haircut1, haircut2, haircut3],
+    haircutImages: [haircutPlaceholder, haircutPlaceholder, haircutPlaceholder],
   },
   {
     id: "004",
@@ -51,7 +49,7 @@ const appointmentsData = [
     avatar: profileImage,
     notes: "Very particular about the length. Use clippers setting 3.",
     rating: 4.5,
-    haircutImages: [haircut1, haircut2, haircut3],
+    haircutImages: [haircutPlaceholder, haircutPlaceholder, haircutPlaceholder],
   },
 ];
 

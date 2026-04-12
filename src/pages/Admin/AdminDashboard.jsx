@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Button, Skeleton } from '@mantine/core';
 import { MonthlyAppointmentsIcon, AnnualAppointmentsIcon, TotalRevenueIcon, RecurringVsNewClientsIcon } from '../../components/common/Svgs';
-import AppointmentsTrendChart from '../../components/admin/AppointmentsTrendChart';
-import TopBarberChart from '../../components/admin/TopBarberChart';
-import RevenueBreakdownChart from '../../components/admin/RevenueBreakdownChart';
 import { useAdminUserStats, useAdminRevenueProjection, useAdminAppointmentTrends } from '../../hooks/useAdmin';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import BatchTranslationLoader from '../../components/barber/BatchTranslationLoader';
-import { exportToCSV, exportToPDF, prepareDashboardData } from '../../utils/exportUtils';
 import { toast } from 'sonner';
 
+const AppointmentsTrendChart = lazy(() => import('../../components/admin/AppointmentsTrendChart'));
+const TopBarberChart = lazy(() => import('../../components/admin/TopBarberChart'));
 
 const StatCardSkeleton = () => (
     <div className="bg-white p-6 rounded-xl shadow-md flex justify-between items-center">
@@ -19,6 +17,12 @@ const StatCardSkeleton = () => (
         </div>
         <Skeleton height={64} circle />
     </div>
+);
+
+const ChartCardSkeleton = ({ height = 350 }) => (
+  <div className="bg-white p-6 rounded-xl shadow-md mt-6">
+    <Skeleton height={height} />
+  </div>
 );
 
 const AdminDashboard = () => {
@@ -76,6 +80,7 @@ const AdminDashboard = () => {
   const handleExportCSV = async () => {
     try {
       setIsExporting(true);
+      const { exportToCSV, prepareDashboardData } = await import('../../utils/exportUtils');
       const exportData = prepareDashboardData(userStats, revenueData, trendsData);
       await exportToCSV(exportData);
       toast.success(tc('csvExportedSuccessfully') || 'CSV exported successfully!');
@@ -89,6 +94,7 @@ const AdminDashboard = () => {
   const handleExportPDF = async () => {
     try {
       setIsExporting(true);
+      const { exportToPDF, prepareDashboardData } = await import('../../utils/exportUtils');
       const exportData = prepareDashboardData(userStats, revenueData, trendsData);
       await exportToPDF(exportData);
       toast.success(tc('pdfExportedSuccessfully') || 'PDF exported successfully!');
@@ -167,10 +173,14 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-        <AppointmentsTrendChart isLoading={trendsLoading} />
+        <Suspense fallback={<ChartCardSkeleton height={350} />}>
+          <AppointmentsTrendChart isLoading={trendsLoading} />
+        </Suspense>
         <div className="bg-white p-6 rounded-xl shadow-md mt-6  gap-6">
           <div>
-            <TopBarberChart isLoading={userStatsLoading} />
+            <Suspense fallback={<Skeleton height={400} />}>
+              <TopBarberChart isLoading={userStatsLoading} />
+            </Suspense>
           </div>
         </div>
       </div>

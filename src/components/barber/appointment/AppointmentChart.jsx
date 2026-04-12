@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import ReactApexChart from "react-apexcharts";
 import { FaCalendarAlt, FaUsers, FaUser } from "react-icons/fa";
 import { MonthPicker } from "@mantine/dates";
 import { Popover, Skeleton, Select, Tooltip } from "@mantine/core";
@@ -7,6 +6,7 @@ import dayjs from "dayjs";
 import { axiosInstance } from '../../../configs/axios.config';
 import { useBatchTranslation } from '../../../contexts/BatchTranslationContext';
 import { useGetStaff } from '../../../hooks/useStaff';
+import SimpleVerticalBarChart from '../../common/charts/SimpleVerticalBarChart';
 
 const AppointmentChart = ({ selectedDate: propsDate, onDateChange, selectedStaffId: propsStaffId, onStaffChange }) => {
   const [selectedDate, setSelectedDate] = useState(propsDate || dayjs().startOf('year').toDate());
@@ -193,76 +193,10 @@ const AppointmentChart = ({ selectedDate: propsDate, onDateChange, selectedStaff
   const selectedDateObj = dayjs(selectedDate);
   const chartData = getChartData();
 
-  const options = {
-    chart: {
-      type: "bar",
-      height: 350,
-      zoom: {
-        enabled: false,
-      },
-      toolbar: {
-        show: false,
-      },
-    },
-    colors: ["#00BE7099"],
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: viewMode === 'year' ? "55%" : "35%",
-        borderRadius: 5,
-        borderRadiusApplication: "end",
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      show: true,
-      width: 2,
-      colors: ["transparent"],
-    },
-    xaxis: {
-      categories: chartData.categories,
-      title: {
-        text: viewMode === 'year' ? tc('months') : tc('days'),
-      },
-      labels: {
-        rotate: 0,
-        rotateAlways: false,
-        hideOverlappingLabels: false,
-        trim: false,
-        style: {
-          fontSize: '11px',
-        },
-      },
-      tickPlacement: 'on',
-    },
-    yaxis: {
-      labels: {
-        formatter: (val) => {
-          if (val === 0) return '0';
-          // Format with max 2 decimal places, removing trailing zeros
-          return Number(val.toFixed(2)).toLocaleString();
-        },
-      },
-    },
-    fill: {
-      opacity: 1,
-    },
-    tooltip: {
-      x: {
-        formatter: (val) => {
-          if (viewMode === 'month') {
-            return `${tc('day')} ${val}`;
-          }
-          return val;
-        },
-      },
-      y: {
-        formatter: (val) => val === 0 ? tc('noDataAvailable') : `$${val.toLocaleString()}`,
-      },
-    },
-  };
+  const barChartData = chartData.categories.map((label, index) => ({
+    label,
+    value: chartData.series[0]?.data[index] || 0,
+  }));
 
   if (error) {
     return (
@@ -385,13 +319,14 @@ const AppointmentChart = ({ selectedDate: propsDate, onDateChange, selectedStaff
           </div>
         ) : (
           <div style={{ minWidth: chartData.categories.length * 30 }}>
-            <ReactApexChart
+            <SimpleVerticalBarChart
               key={`chart-${currentLanguage}-${viewMode}-${selectedDateObj.format('YYYY-MM')}-${selectedStaffId}`}
-              options={options}
-              series={chartData.series}
-              type="bar"
+              data={barChartData}
               height={340}
-              width="100%"
+              color="#00BE7099"
+              minColumnWidth={viewMode === 'year' ? 48 : 30}
+              formatValue={(value) => Number(value.toFixed(2)).toLocaleString()}
+              emptyLabel={tc('noDataAvailable')}
             />
           </div>
         )}
