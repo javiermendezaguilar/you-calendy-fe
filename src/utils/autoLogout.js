@@ -7,7 +7,7 @@
 import { getCurrentUserContext } from './authUtils';
 import { toast } from 'sonner';
 
-const baseURL = import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+const baseURL = import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
 
 // Failure tracking for detecting cookie failures
 const failureTracker = {

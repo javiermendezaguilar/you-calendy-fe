@@ -7,13 +7,16 @@ import { useEffect } from "react";
 import React from "react";
 import { processInvitationFromUrl } from "./utils/invitationUtils";
 import GlobalBlockingLoader from "./components/common/GlobalBlockingLoader";
+import { isCurrentContextAuthenticated } from "./utils/authUtils";
 
 function App() {
+  const shouldInitializeAuthManager = isCurrentContextAuthenticated();
+
   // Enable automatic page tracking
   usePageTracking();
   
   // Initialize authentication manager
-  useAuthManager();
+  useAuthManager(shouldInitializeAuthManager);
 
   // Process invitation token from URL on app load
   useEffect(() => {

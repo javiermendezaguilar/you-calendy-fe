@@ -3,7 +3,7 @@ import { axiosInstance, formAxios } from '../configs/axios.config';
 // Use the main axios instance for consistency
 const apiClient = axiosInstance;
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
 
 /**
  * Get client details by invitation token

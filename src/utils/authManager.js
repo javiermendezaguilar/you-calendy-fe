@@ -153,7 +153,7 @@ class AuthManager {
    */
   async validateSessionWithServer() {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/auth/me`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/auth/me`, {
         method: 'GET',
         credentials: 'include', // Send cookies automatically
         headers: {

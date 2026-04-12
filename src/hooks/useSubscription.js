@@ -3,26 +3,14 @@ import { businessAPI } from "../services/businessAPI";
 import { toast } from "sonner";
 import { useBatchTranslation } from "../contexts/BatchTranslationContext";
 import { getCurrentUser } from "../utils/authUtils";
-import custAxios from "../configs/axios.config";
 
 // Get subscription status
 export const useSubscriptionStatus = () => {
-  // Resolve current user via local storage first, then fall back to /auth/me
+  // Protected barber routes are gated by local auth state before mounting.
+  // Hitting /auth/me without that state creates noisy auth/CORS failures in previews.
   const storedUser = getCurrentUser('barber');
-
-  const { data: meData } = useQuery({
-    queryKey: ["me", !!storedUser],
-    queryFn: async () => {
-      const res = await custAxios.get("/auth/me");
-      return res.data?.data; // backend wraps user under data
-    },
-    enabled: !!storedUser === false, // Only fetch if no stored user
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-  });
-
-  const userId = storedUser?._id || storedUser?.id || meData?._id || null;
-  const user = storedUser || meData;
+  const userId = storedUser?._id || storedUser?.id || null;
+  const user = storedUser || null;
 
   return useQuery({
     queryKey: ["subscriptionStatus", userId || "unknown"],

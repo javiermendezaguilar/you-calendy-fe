@@ -1,43 +1,25 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./sentry.js";
-import App from "./App.jsx";
-import "./index.css";
-import "./i18n.js";
-import { BrowserRouter } from "react-router-dom";
-import QueryProvider from "./configs/query.config.jsx";
-import { MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from './store/store.js';
-import { Toaster as SonnerToaster } from 'sonner';
-import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
-import { BatchTranslationProvider } from './contexts/BatchTranslationContext.jsx';
+import AppProviders from "./AppProviders.jsx";
+import AppErrorBoundary from "./components/common/AppErrorBoundary.jsx";
 
-if (window.location.hostname === "www.groomnest.com") {
+const legacyFrontendHosts = new Set([
+  "app.groomnest.com",
+  "www.groomnest.com",
+  "you-calendy-fe-three.vercel.app",
+  "you-calendy-fe-pi.vercel.app",
+]);
+
+if (legacyFrontendHosts.has(window.location.hostname)) {
   const redirectUrl = `https://groomnest.com${window.location.pathname}${window.location.search}${window.location.hash}`;
   window.location.replace(redirectUrl);
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <MantineProvider>
-            <AnalyticsProvider>
-              <BatchTranslationProvider>
-                <QueryProvider>
-                  <App />
-                  <SonnerToaster richColors position="top-right" />
-                </QueryProvider>
-              </BatchTranslationProvider>
-            </AnalyticsProvider>
-          </MantineProvider>
-        </PersistGate>
-      </Provider>
-    </BrowserRouter>
+    <AppErrorBoundary>
+      <AppProviders />
+    </AppErrorBoundary>
   </React.StrictMode>
 );

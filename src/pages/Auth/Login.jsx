@@ -230,7 +230,7 @@ const Login = () => {
 
       const response = await login({...values, userType: 'user'});
 
-      if (response && response.data && response.data.user) {
+      if (response?.data?.user) {
         navigate("/dashboard");
       }
     } catch (error) {

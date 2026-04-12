@@ -2,11 +2,11 @@
 const getApiBaseUrl = () => {
   // If we're in development mode, use localhost
   if (import.meta.env.DEV) {
-    return import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+    return import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
   }
   
   // If we're in production, use production URL
-  return 'https://you-calendy-be.up.railway.app';
+  return 'https://api.groomnest.com';
 };
 
 const API_BASE_URL = getApiBaseUrl();

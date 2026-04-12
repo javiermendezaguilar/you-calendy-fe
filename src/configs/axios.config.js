@@ -4,7 +4,7 @@ import { handleAutoLogout, isAutoLogoutInProgress, trackSuccess } from "../utils
 import { getCurrentUserContext } from "../utils/authUtils";
 
 // Use environment variable for API base URL with fallback
-export const baseURL = import.meta.env.VITE_API_URL || "https://you-calendy-be.up.railway.app";
+export const baseURL = import.meta.env.VITE_API_URL || "https://api.groomnest.com";
 
 const api = axios.create({
   baseURL: baseURL,
