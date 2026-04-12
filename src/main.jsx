@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./sentry.js";
 import App from "./App.jsx";
 import "./index.css";
 import "./i18n.js";
@@ -14,6 +15,11 @@ import { store, persistor } from './store/store.js';
 import { Toaster as SonnerToaster } from 'sonner';
 import { AnalyticsProvider } from './contexts/AnalyticsContext.jsx';
 import { BatchTranslationProvider } from './contexts/BatchTranslationContext.jsx';
+
+if (window.location.hostname === "www.groomnest.com") {
+  const redirectUrl = `https://groomnest.com${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.location.replace(redirectUrl);
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
