@@ -6,10 +6,10 @@ import { getClientByInvitationToken } from '../../services/clientAPI';
 import { clearInvitationToken } from '../../utils/invitationUtils';
 import { toast } from 'sonner';
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 
 const MotionDiv = motion.div;
 
-const Footer = lazy(() => import("../../components/home/landing/Footer"));
 const Gallery = lazy(() => import("./Gallery"));
 const LazyClientProfile = lazy(() => import("./ClientProfile"));
 const ProfileCompletionModal = lazy(() => import('../../components/client/ProfileCompletionModal'));
@@ -217,9 +217,7 @@ const Homepage = () => {
         )}
       </AnimatePresence>
 
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
+      <LazyFooter />
       
       {showProfileModal ? (
         <Suspense fallback={null}>

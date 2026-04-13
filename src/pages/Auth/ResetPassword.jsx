@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button, TextInput, PasswordInput, Text, PinInput, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import Footer from "../../components/home/landing/Footer";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 import { HeaderLogo } from "../../components/common/Svgs";
 import { useResetPassword } from "../../hooks/useForgotPassword";
 
@@ -231,7 +231,7 @@ const ResetPassword = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

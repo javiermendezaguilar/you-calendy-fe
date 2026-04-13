@@ -1,10 +1,10 @@
 import React, { Suspense, lazy } from "react";
 import { Home } from "./Home";
 import { motion } from "framer-motion";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 
 const MotionDiv = motion.div;
 
-const Footer = lazy(() => import("../../components/home/landing/Footer"));
 const Gallery = lazy(() => import("./Gallery"));
 
 const pageVariants = {
@@ -33,9 +33,7 @@ const Homepage = () => {
         </div>
       </MotionDiv>
 
-      <Suspense fallback={null}>
-        <Footer />
-      </Suspense>
+      <LazyFooter />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n';
+import i18n, { ensureLanguageResources } from '../i18n';
 import batchTranslationService from '../services/batchTranslationService';
 import textExtractionService from '../services/textExtractionService';
 import contextDetectionService from '../services/contextDetectionService';
@@ -2089,7 +2089,7 @@ export const BatchTranslationProvider = ({ children }) => {
   const [commonTexts] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
-  const [autoExtractionEnabled, setAutoExtractionEnabled] = useState(true);
+  const [autoExtractionEnabled, setAutoExtractionEnabled] = useState(false);
   const [extractedTexts, setExtractedTexts] = useState([]);
   const [, setTranslationsUpdated] = useState(0);
 
@@ -2263,9 +2263,7 @@ export const BatchTranslationProvider = ({ children }) => {
       // Ignore storage write failures; language already changed in memory.
     }
 
-    // Update i18next synchronously (texts are local, should be instant)
-    // Use void to explicitly ignore the promise
-    void i18n.changeLanguage(newLanguage);
+    void ensureLanguageResources(newLanguage).then(() => i18n.changeLanguage(newLanguage));
 
     // Update dayjs locale for calendar/date components
     dayjs.locale(newLanguage);

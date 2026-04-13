@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { Button, TextInput, PasswordInput, Text } from "@mantine/core";
 import { useForm, isNotEmpty, isEmail } from "@mantine/form";
-import Footer from "../../components/home/landing/Footer";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 import { HeaderLogo } from "../../components/common/Svgs";
 import { useMutation } from "@tanstack/react-query";
 import custAxios from "../../configs/axios.config";
@@ -191,7 +191,7 @@ const AdminLogin = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

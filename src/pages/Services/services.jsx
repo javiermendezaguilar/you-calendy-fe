@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Plus, Trash2, ChevronDown, X, PenSquare, AlertCircle } from 'lucide-react';
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { Button, TextInput, NumberInput, Select, Checkbox, Text, LoadingOverlay } from '@mantine/core';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -495,7 +495,7 @@ const Services = () => {
           }
         />
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

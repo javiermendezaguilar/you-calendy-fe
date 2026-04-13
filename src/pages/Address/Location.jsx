@@ -5,7 +5,7 @@ import { ArrowLeft, Navigation, Search, CheckCircle, AlertCircle, MapPin as MapP
 import { Button, TextInput, Loader, Paper, Text, Transition } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { GoogleMap, useJsApiLoader, Marker, Autocomplete } from "@react-google-maps/api";
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { HeaderLogo } from "../../components/common/Svgs";
 import { setLocation, nextStep, prevStep } from '../../store/registrationSlice';
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
@@ -399,7 +399,7 @@ const Location = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };
