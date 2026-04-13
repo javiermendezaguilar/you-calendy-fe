@@ -1,3 +1,4 @@
+/* global process */
 import { defineConfig } from "@playwright/test";
 
 const baseURL = process.env.SMOKE_BASE_URL || "http://127.0.0.1:4173";

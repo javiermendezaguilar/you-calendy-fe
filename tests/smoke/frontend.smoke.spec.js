@@ -1,3 +1,4 @@
+/* global process */
 import { test, expect } from "@playwright/test";
 
 const API_URL = process.env.SMOKE_API_URL || "https://api.groomnest.com";
