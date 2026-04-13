@@ -1,22 +1,39 @@
-import ReactGA from 'react-ga4';
-
 class GoogleAnalyticsService {
   constructor() {
     this.isInitialized = false;
     this.measurementId = null;
+    this.reactGA = null;
+    this.reactGALoadPromise = null;
+  }
+
+  async loadReactGA() {
+    if (this.reactGA) {
+      return this.reactGA;
+    }
+
+    if (!this.reactGALoadPromise) {
+      this.reactGALoadPromise = import('react-ga4').then((module) => {
+        this.reactGA = module.default;
+        return this.reactGA;
+      });
+    }
+
+    return this.reactGALoadPromise;
   }
 
   /**
    * Initialize Google Analytics
    * @param {string} measurementId - GA4 Measurement ID (G-XXXXXXXXXX)
    */
-  initialize(measurementId) {
+  async initialize(measurementId) {
     if (!measurementId) {
       console.warn('Google Analytics Measurement ID not provided');
       return false;
     }
 
     try {
+      const ReactGA = await this.loadReactGA();
+
       ReactGA.initialize(measurementId, {
         debug: process.env.NODE_ENV === 'development',
         testMode: process.env.NODE_ENV === 'test'
@@ -38,12 +55,12 @@ class GoogleAnalyticsService {
    * @param {string} title - Page title
    */
   trackPageView(path, title) {
-    if (!this.isInitialized) {
+    if (!this.isInitialized || !this.reactGA) {
       console.warn('Google Analytics not initialized');
       return;
     }
 
-    ReactGA.send({
+    this.reactGA.send({
       hitType: 'pageview',
       page: path,
       title: title
@@ -58,7 +75,7 @@ class GoogleAnalyticsService {
    * @param {number} value - Event value (optional)
    */
   trackEvent(action, category, label = null, value = null) {
-    if (!this.isInitialized) {
+    if (!this.isInitialized || !this.reactGA) {
       console.warn('Google Analytics not initialized');
       return;
     }
@@ -71,7 +88,7 @@ class GoogleAnalyticsService {
     if (label) eventData.label = label;
     if (value !== null) eventData.value = value;
 
-    ReactGA.event(eventData);
+    this.reactGA.event(eventData);
   }
 
   /**
@@ -115,12 +132,12 @@ class GoogleAnalyticsService {
    * @param {object} properties - User properties
    */
   setUserProperties(userId, properties = {}) {
-    if (!this.isInitialized) {
+    if (!this.isInitialized || !this.reactGA) {
       console.warn('Google Analytics not initialized');
       return;
     }
 
-    ReactGA.set({
+    this.reactGA.set({
       user_id: userId,
       ...properties
     });
@@ -130,12 +147,12 @@ class GoogleAnalyticsService {
    * Track conversion events (for business goals)
    */
   trackConversion(conversionType, value = null) {
-    if (!this.isInitialized) {
+    if (!this.isInitialized || !this.reactGA) {
       console.warn('Google Analytics not initialized');
       return;
     }
 
-    ReactGA.event({
+    this.reactGA.event({
       action: 'conversion',
       category: 'business_goal',
       label: conversionType,
