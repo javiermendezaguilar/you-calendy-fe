@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+import { clientLogin } from './clientAPI';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
 
 /**
  * Helper function to get user's timezone offset in minutes
@@ -179,7 +181,6 @@ export const createClientAppointment = async (appointmentData) => {
       // the original request.  Refresh the cookie and ask the user to try again.
       if (response.status === 401) {
         try {
-          const { clientLogin } = await import('./clientAPI');
           await clientLogin(clientId);
           // Cookie refreshed — tell the user to try again (we cannot replay FormData).
           throw new Error('Session expired. Please try booking again.');

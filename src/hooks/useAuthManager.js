@@ -6,7 +6,7 @@ import { getCurrentUserContext } from '../utils/authUtils';
 /**
  * Hook to manage authentication state and handle auth events
  */
-export const useAuthManager = () => {
+export const useAuthManager = (enabled = true) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,6 +63,10 @@ export const useAuthManager = () => {
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      return undefined;
+    }
+
     // Initialize auth manager
     authManager.init();
 
@@ -76,7 +80,7 @@ export const useAuthManager = () => {
       window.removeEventListener('auth:login', handleAuthLogin);
       authManager.stopHeartbeat();
     };
-  }, [handleAuthLogout, handleAuthLogin]);
+  }, [enabled, handleAuthLogout, handleAuthLogin]);
 
   return {
     authManager,

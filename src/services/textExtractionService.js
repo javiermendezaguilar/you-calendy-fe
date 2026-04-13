@@ -131,7 +131,7 @@ class TextExtractionService {
     );
 
     let textNode;
-    while (textNode = walker.nextNode()) {
+    while ((textNode = walker.nextNode())) {
       const text = textNode.textContent.trim();
       if (text && this.isTranslatableText(text)) {
         this.addExtractedText(text, 'content');
@@ -220,22 +220,21 @@ class TextExtractionService {
    */
   async extractFromTranslationKeys() {
     try {
-      // Import the translation keys dynamically
-      const module = await import('../contexts/BatchTranslationContext.jsx');
+      const catalog = window.__batchTranslationCatalog;
       
       // Access the TRANSLATION_KEYS if exported
-      if (module.TRANSLATION_KEYS) {
-        Object.values(module.TRANSLATION_KEYS).forEach(text => {
+      if (catalog?.TRANSLATION_KEYS) {
+        Object.values(catalog.TRANSLATION_KEYS).forEach(text => {
           if (text && this.isTranslatableText(text)) {
             this.addExtractedText(text, 'translation-key');
           }
         });
-        // console.log(`Extracted ${Object.keys(module.TRANSLATION_KEYS).length} translation keys`);
+        // console.log(`Extracted ${Object.keys(catalog.TRANSLATION_KEYS).length} translation keys`);
       }
       
       // Also extract from COMMON_TEXTS if available
-      if (module.COMMON_TEXTS) {
-        module.COMMON_TEXTS.forEach(text => {
+      if (catalog?.COMMON_TEXTS) {
+        catalog.COMMON_TEXTS.forEach(text => {
           if (text && this.isTranslatableText(text)) {
             this.addExtractedText(text, 'common-text');
           }
@@ -304,7 +303,7 @@ class TextExtractionService {
     if (/^\d+$/.test(text.trim())) return false;
     
     // Skip URLs
-    if (/^https?:\/\//.test(text.trim())) return false;
+    if (/^https?:[/][/]/.test(text.trim())) return false;
     
     // Skip email addresses
     if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text.trim())) return false;
@@ -313,7 +312,7 @@ class TextExtractionService {
     if (/^[.#][a-zA-Z0-9_-]+$/.test(text.trim())) return false;
     
     // Skip file paths
-    if (/[\/\\]/.test(text.trim())) return false;
+    if (/[\\/]/.test(text.trim())) return false;
     
     // Skip code-like strings
     if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(text.trim()) && text.trim().length < 3) return false;
@@ -399,9 +398,9 @@ class TextExtractionService {
 
     // Skip common non-translatable patterns
     const skipPatterns = [
-      /^\s*[{}()\[\]<>]+\s*$/,  // Brackets and symbols only
+      /^\s*[{}()[\]<>]+\s*$/,   // Brackets and symbols only
       /^\s*[.,;:!?]+\s*$/,      // Punctuation only
-      /^\s*[-_=+*\/]+\s*$/,     // Special characters only
+      /^\s*[-_=+*/]+\s*$/,      // Special characters only
       /^\d{1,2}:\d{2}(:\d{2})?(\s*(AM|PM))?$/i, // Time formats
       /^\d{1,2}\/\d{1,2}\/\d{2,4}$/, // Date formats
       /^[A-Z]{2,}$/,             // All caps abbreviations (unless common words)
@@ -413,7 +412,7 @@ class TextExtractionService {
   /**
    * Add extracted text to the collection
    */
-  addExtractedText(text, type = 'content') {
+  addExtractedText(text) {
     const cleanText = text.trim();
     if (cleanText && !this.extractedTexts.has(cleanText)) {
       this.extractedTexts.add(cleanText);

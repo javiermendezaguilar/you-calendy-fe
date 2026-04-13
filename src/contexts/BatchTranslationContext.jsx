@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import batchTranslationService from '../services/batchTranslationService';
@@ -71,9 +71,7 @@ const TRANSLATION_KEYS = {
   'marketing': 'Marketing',
   'settings': 'Settings',
   'profile': 'Profile',
-  'logout': 'Logout',
   'purchaseCredits': 'Purchase Credits',
-  'subscriptionStatus': 'Subscription Status',
   'currentPlan': 'Current Plan',
   'trialDaysLeft': 'Trial Days Left',
   'upgradePlan': 'Upgrade Plan',
@@ -89,7 +87,6 @@ const TRANSLATION_KEYS = {
   'youAreCurrentlyOnFreeTrial': 'You are currently on a free trial.',
 
   // Client Management
-  'clientManagement': 'Client Management',
   'creditManagement': 'Credit Management',
   'creditPackageManagement': 'Credit Package Management',
   'addNewPackage': 'Add New Package',
@@ -144,12 +141,10 @@ const TRANSLATION_KEYS = {
   'sortClients': 'Sort Clients',
   'filterClients': 'Filter Clients',
   'filterOptionsText': 'Filter Options',
-  'clientName': 'Client Name',
   'searchByName': 'Search by name...',
   'name': 'Name',
   'emailAddress': 'Email Address',
   'status': 'Status',
-  'notFilledYet': 'Not filled yet',
   'inactive': 'Inactive',
   'noNotesYet': 'No notes yet',
   'of': 'of',
@@ -160,7 +155,6 @@ const TRANSLATION_KEYS = {
 
   // Common Actions
   'save': 'Save',
-  'cancel': 'Cancel',
   'delete': 'Delete',
   'edit': 'Edit',
   'add': 'Add',
@@ -176,7 +170,6 @@ const TRANSLATION_KEYS = {
   'filter': 'Filter',
   'sort': 'Sort',
   'refresh': 'Refresh',
-  'loading': 'Loading...',
   'error': 'Error',
   'success': 'Success',
   'warning': 'Warning',
@@ -203,7 +196,6 @@ const TRANSLATION_KEYS = {
   'appointmentManagement': 'Appointment Management',
   'serviceSetup': 'Service Setup',
   'businessSettings': 'Business Settings',
-  'notifications': 'Notifications',
   'reports': 'Reports',
   'analytics': 'Analytics',
   'calendar': 'Calendar',
@@ -212,7 +204,6 @@ const TRANSLATION_KEYS = {
   'services': 'Services',
   'pricing': 'Pricing',
   'gallery': 'Gallery',
-  'reviews': 'Reviews',
   'earnings': 'Earnings',
   'payments': 'Payments',
   'invoices': 'Invoices',
@@ -220,11 +211,6 @@ const TRANSLATION_KEYS = {
   'expenses': 'Expenses',
 
   // Appointment Calendar specific
-  'unknownClient': 'Unknown Client',
-  '1hourBefore': '1 hour before',
-  '2hourBefore': '2 hour before',
-  '3hourBefore': '3 hour before',
-  '4hourBefore': '4 hour before',
   'before': 'before',
 
   // Penalty Modal
@@ -331,25 +317,15 @@ const TRANSLATION_KEYS = {
   'errorLoadingStaff': 'Error loading staff members',
   'selectStaffMember': 'Select a staff member',
   'addAndInvite': 'Invite',
-  'automatedAppointmentReminders': 'Automated Appointment Reminders',
-  'appointmentReminders': 'Appointment Reminders',
-  'setupSmsReminders': 'Setup SMS Reminders',
-  'remindersTime': 'Reminders Time',
-  'customComment': 'Custom Comment',
-  'addYourCustomCommentHere': 'Add your custom comment here',
   'selectClients': 'Select Clients',
   'rescheduleDetails': 'Reschedule Details',
   'newDate': 'New Date',
   'newStartTime': 'New Start Time',
-  'writeYourMessage': 'Write Your Message',
   // NotifyClient.jsx specific additions
   'sendDelayMessage': 'Send a delay message to one or more clients scheduled for today.',
-  'writeYourMessageHere': 'Write your message here...',
-  'loadingClients': 'Loading clients...',
   'noClientsAvailable': 'No clients available',
   'newDateRequired': 'New date is required',
   'newStartTimeRequired': 'New start time is required',
-  'selectAtLeastOneClient': 'Please select at least one client',
   'contactInfo': 'Contact Info',
 
   // Date and time
@@ -359,7 +335,6 @@ const TRANSLATION_KEYS = {
   'endTime': 'End Time',
   'duration': 'Duration',
   'appointmentDate': 'Appointment Date',
-  'appointmentTime': 'Appointment Time',
 
   // Client related (duplicate removed)
   'clientEmail': 'Client Email',
@@ -401,9 +376,7 @@ const TRANSLATION_KEYS = {
   'hindi': 'Hindi',
 
   // Notification
-  'notification': 'Notification',
   'markAllAsRead': 'Mark all as read',
-  'noNotifications': 'No notifications',
   'pleaseLoginToViewNotifications': 'Please log in to view notifications',
   'newNotification': 'New notification',
   'notificationPreferences': 'Notification Preferences',
@@ -420,19 +393,15 @@ const TRANSLATION_KEYS = {
   'preferences': 'Preferences',
 
   // Logout
-  'logoutConfirmation': 'Logout Confirmation',
-  'areYouSureLogout': 'Are you sure you want to logout?',
 
   // Message
 
   'selectClient': 'Select Client',
-  'sendMessage': 'Send Message',
   'messageHistory': 'Message History',
   'newMessage': 'New Message',
 
   // Link generated
   'linkGenerated': 'Link Generated',
-  'copyLink': 'Copy Link',
   'shareLink': 'Share Link',
 
   // Never miss updates
@@ -481,7 +450,6 @@ const TRANSLATION_KEYS = {
   'lastVisit': 'Last Visit',
   'viewSuggestion': 'View Suggestion',
   'viewReport': 'View Report',
-  'noDataAvailable': 'No data available',
   'issueReport': 'Issue Report',
   'suggestionNote': 'Suggestion Note',
   'from': 'from',
@@ -489,12 +457,10 @@ const TRANSLATION_KEYS = {
   'suggestion': 'Suggestion',
   'noContentAvailable': 'No content available',
   'rating': 'Rating',
-  'client': 'Client',
   'barberResponse': 'Barber response',
   'respondHere': 'Respond here...',
   'pleaseEnterAResponse': 'Please enter a response',
   'responseSent': 'Response sent',
-  'sending': 'Sending…',
   'send': 'Send',
   'suggestionNotes': 'Suggestion Notes',
   'issueReports': 'Issue Reports',
@@ -504,7 +470,6 @@ const TRANSLATION_KEYS = {
   'failedToReportImage': 'Failed to report image',
 
   // View details
-  'viewDetails': 'View Details',
 
   // Staff Management
   'staffManagement': 'Staff Management',
@@ -541,7 +506,6 @@ const TRANSLATION_KEYS = {
   'selectTargetDays': 'Select target days',
   'replicate': 'Replicate',
   'hours': 'Hours',
-  'minutes': 'Minutes',
   'mustBeBetween': 'Must be between',
   'and': 'and',
   'selectHours': 'Select hours',
@@ -594,7 +558,6 @@ const TRANSLATION_KEYS = {
   'pleaseProvideReasonForDeletion': 'Please provide a reason for deletion',
 
   // Support
-  'support': 'Support',
   'createNewTicket': 'Create New Ticket',
   'submitRequestGetSupport': 'Submit a request to get support',
   'enterSubjectError': 'Subject is required',
@@ -606,7 +569,6 @@ const TRANSLATION_KEYS = {
   'describeYourIssue': 'Describe your issue...',
 
   // Suggest Feature
-  'suggestFeature': 'Suggest Feature',
   'titleMinLengthError': 'Title must be at least 2 characters',
   'descriptionMinLengthError': 'Description must be at least 2 characters',
   'suggestFeatureDescription': 'Help us improve by suggesting new features',
@@ -632,8 +594,6 @@ const TRANSLATION_KEYS = {
 
   // Topbar
   'appointment': 'Appointment',
-  'generateCustomGoogleReviewLink': 'Generate a custom Google review link and send it to your client to get feedback',
-  'neverMissUpdate': 'Never miss an important update',
 
   // Business Settings
   'businessInformation': 'Business Information',
@@ -688,7 +648,6 @@ const TRANSLATION_KEYS = {
   // Appointment Dashboard
   'makeAnAppointment': 'Make an appointment',
   'easilyManageClientsBookings': 'Easily manage your clients and bookings.',
-  'errorLoadingRevenueData': 'Error loading revenue data',
   'errorLoadingAppointmentStatistics': 'Error loading appointment statistics',
   'appointmentsOccupancy': 'Appointments & Occupancy',
   'revenueProjection': 'Revenue Projection',
@@ -711,52 +670,14 @@ const TRANSLATION_KEYS = {
   'finishedTooltip': 'Finished Status Tooltip',
   'cancelledTooltip': 'Cancelled Status Tooltip',
   'noShowTooltip': 'No-Show Status Tooltip',
-  'revenue': 'Revenue',
   'day': 'Day',
   'noDataAvailable': 'No data available',
   'errorLoadingRevenueData': 'Error loading revenue data',
-  'totalRevenue': 'Total Revenue',
   'unknownClient': 'Unknown Client',
   'loading': 'Loading...',
-  'mins': 'mins',
-  'min': 'min',
-  'clientHasGivenSuggestion': 'Client has given suggestion',
-  'noSuggestionsAvailable': 'No suggestions available',
-  'off': 'off',
-  'paid': 'Paid',
-  'unpaid': 'Unpaid',
-  'delay': 'Delay',
-  'promotion': 'Promotion',
-  'flashSale': 'Flash Sale',
   'registered': 'App User',
   'unregistered': 'Walk-in / Phone',
-  'loadingClients': 'Loading clients...',
-  'pleaseSelectClientFirst': 'Please select client first',
-  'invalidClientIdFormat': 'Invalid client ID format',
-  'reviewRequestSentSuccessfully': 'Review Request Sent Successfully',
-  'reviewLinkGeneratedButSmsNotSent': 'Review Link Generated but SMS not sent',
 
-  'sending': 'Sending...',
-  'messageMinLength': 'Message is too short',
-  'selectAtLeastOneClient': 'Select at least one client',
-  'someClientsMissingAppointments': 'Some clients are missing appointments',
-  'runningLateTitle': 'Running Late',
-  'runningLateDescription': 'Notify clients that you are running late',
-  'aheadOfScheduleTitle': 'Ahead of Schedule',
-  'aheadOfScheduleDescription': 'Notify clients that you are ahead of schedule',
-  'cancelDayTitle': 'Cancel Day',
-  'cancelDayDescription': 'Notify clients that you are cancelling the day',
-  'runningLatePresetMessage': 'Hi {clientName}, I\'m running a bit late today. You can arrive a few minutes later than your scheduled appointment time. Thanks for your understanding!',
-  'aheadOfSchedulePresetMessage': 'Hi {clientName}, I\'m ahead of schedule today! Feel free to come earlier than your planned appointment time if that works for you. See you soon!',
-  'cancelDayPresetMessage': 'Hi {clientName}, I regret to inform you that due to unforeseen circumstances, I won\'t be able to attend appointments today. We\'ll need to reschedule your appointment. I apologize for the inconvenience and will contact you soon to find a new time.',
-  'quickMessageTemplates': 'Quick Message Templates',
-  'clientsWithAppointments': 'Clients with Appointments',
-  'loadingAppointments': 'Loading appointments...',
-  'noAppointmentsForDate': 'No appointments for this date',
-  'writeYourMessage': 'Write your message',
-  'writeYourMessageHere': 'Write your message here...',
-  'messagePersonalizationHint': 'Use {clientName} to personlize the message',
-  'sendMessage': 'Send Message',
   'automatedAppointmentReminders': 'Automated Appointment Reminders',
   'setupSmsReminders': 'Setup SMS Reminders',
   'appointmentReminders': 'Appointment Reminders',
@@ -788,57 +709,27 @@ const TRANSLATION_KEYS = {
   'showingGlobalPerformance': 'Showing Global Performance',
   'showingIndividualPerformance': 'Showing Individual Performance',
   'ourBusiness': 'our business',
-  'selectDate': 'Select Date',
   'unnamedClient': 'Unnamed Client',
   'clientName': 'Client Name',
   'appointmentTime': 'Appointment Time',
-  'loadingAppointments': 'Loading appointments...',
-  'noAppointmentsForDate': 'No appointments scheduled for this date.',
   'writeYourMessage': 'Write Your Message',
   'writeYourMessageHere': 'Write your message here...',
-  'messageMinLength': 'Message is too short',
   'selectAtLeastOneClient': 'Select at least one client',
-  'someClientsMissingAppointments': 'Some selected clients are missing appointment information',
-  'appointmentService': 'Appointment Service',
-  'notifyClients': 'Notify Clients',
-  'notifyClientsTooltip': 'Notify Clients Tooltip',
-  'notifyClientsDescription': 'Select a date and clients to send them a notification message.',
-  'noShowFor': 'No-Show for {clientName}',
-  'clientIncidentHistory': 'Client Incident History',
-  'noIncidentHistoryFound': 'No incident history found for this client.',
-  'incidentNotes': 'Incident Notes',
-  'addIncidentNotePlaceholder': 'Add detailed notes about the incident...',
-  'incidentNoteWillBePermanentlyAssociated': 'This note will be permanently associated with the client\'s profile.',
   'noShowConfirmation': 'No-Show Confirmation',
   'blockExplanationPart1': 'If you select yes, the client will be redirected to call by phone the next time they try to book. This allows you to personally speak with them about the absence and decide whether to accommodate a new appointment.',
   'blockExplanationPart2': 'This measure helps reduce no-shows and promotes responsible appointment management.',
   'blockClientFutureAppointmentsQuestion': 'Do you want to temporarily block this client from making future booking requests through the app?',
   'yesBlockClient': 'Yes, block client',
   'noJustRecord': 'No, just record no-show',
-  'newAppointmentTooltip': 'Create a new appointment',
-  'generateReviewLinkTooltip': 'Generate a custom Google review link and send it to your client to get feedback',
-  'failedToGenerateReviewLink': 'Failed to generate review link',
-  'sendReviewRequestToClient': 'Send a review request to {clientName}',
   'hasNoShowHistoryTooltip': 'Has no-show history',
   'noSuggestionsAvailable': 'No suggestions available',
-  'appUser': 'App User',
-  'walkInOrPhone': 'Walk-in / Phone',
   'clientNotifiedOfDelay': 'Client notified of delay',
   'penalty': 'Penalty',
-  'clientHasGivenSuggestion': 'Client has given a suggestion',
-  'hasNoShowHistory': 'Has no-show history',
-  'off': 'off',
   'min': 'min',
-  'mins': 'mins',
-  'noShow': 'No-Show',
-  'flashSale': 'Flash Sale',
   'promotion': 'Promotion',
   'delay': 'Delay',
   'paid': 'Paid',
   'unpaid': 'Unpaid',
-  'runningLatePresetMessage': 'Hello {clientName}, I am running a bit late today. I should be ready in about 15-20 minutes. Sorry for the wait!',
-  'aheadOfSchedulePresetMessage': 'Hi {clientName}, I am running ahead of schedule today. If you want to come in earlier, I can take you now!',
-  'cancelDayPresetMessage': 'Hi {clientName}, unfortunately I have to cancel all appointments for today due to unforeseen circumstances. I will contact you soon to reschedule. Sorry for the inconvenience.',
 
   // Agenda View Modes
   'generalAgenda': 'General Agenda',
@@ -849,16 +740,7 @@ const TRANSLATION_KEYS = {
   'no': 'No',
   // Review Link Modal (Shared & Inline)
   'sendAReviewRequest': 'Send a Review Request',
-  'generateReviewLink': 'Generate review link',
-  'sendReviewRequestToClient': 'Send review request to {clientName}',
-  'sendReviewRequest': 'Send review request',
   'defaultReviewMessage': 'Hey {clientName}, thank you for visiting! Would you mind leaving us a quick review on Google? It really helps us a lot!',
-  'thankYouForVisiting': 'Hey, thank you for visiting {businessName}! Would you mind leaving us a quick review on Google? {link}',
-  'reviewRequestSentSuccessfully': 'Review request sent successfully',
-  'reviewLinkGeneratedButSmsNotSent': 'Review link generated but SMS not sent',
-  'failedToGenerateReviewLink': 'Failed to generate review link',
-  'pleaseSelectClientFirst': 'Please select client first',
-  'invalidClientIdFormat': 'Invalid client ID format',
   'loadingClients': 'Loading clients...',
   'sendReviewRequestViaSmsDescription': 'Send a Google review request to your client via SMS. Make sure your business has a Google Place ID configured in settings.',
   'writeMessage': 'Write message',
@@ -866,12 +748,6 @@ const TRANSLATION_KEYS = {
   'reviews': 'Reviews',
   'client': 'client',
   'notFilledYet': 'not filled yet',
-  'appointmentCompletedAndReviewSent': 'Appointment completed and review request sent successfully',
-  'appointmentCompletedSuccessfully': 'Appointment completed successfully',
-  'messageNotSentError': 'Message not sent:',
-  'reviewRequestNoCredits': 'Review request failed: No SMS credits available',
-  'reviewRequestFailed': 'Review request failed. Please check your settings.',
-  'failedToCompleteAppointment': 'Failed to complete appointment',
 
   // Happy Hours
   'manageYourHappyHours': 'Manage Your Happy Hours',
@@ -970,7 +846,6 @@ const TRANSLATION_KEYS = {
   'reviewRequestNoCredits': 'Review request could not be sent because you have 0 SMS credits. Please purchase SMS credits to send review requests.',
   'reviewRequestFailed': 'Review request could not be sent. Please check your SMS credits or try again.',
   'failedToCompleteAppointment': 'Failed to complete appointment',
-  'thankYouForVisiting': 'Thank you for visiting {businessName}! We\'d love to hear about your experience. Please leave us a review: {link}',
   'massNotification': 'Mass Notification',
   'sendPlatformWideAlertsAndManageUserSupportTickets': 'Send platform-wide alerts and manage user support tickets efficiently.',
   'massNotifications': 'Mass Notifications',
@@ -1196,12 +1071,7 @@ const TRANSLATION_KEYS = {
   'sendReviewRequestToClient': 'Send review request to {clientName}',
   'noClientsWithPhone': 'No clients with phone numbers found',
   'noClientsAvailableHint': 'Add clients with phone numbers to send review requests.',
-  'sendingReviewLink': 'Sending...',
-  'sendReviewLink': 'Send Review Link',
   'reviewLinkSentSuccessfully': 'Review link sent successfully via SMS!',
-  'smsSentSuccessfully': 'SMS Sent Successfully!',
-  'reviewLinkSentToClient': 'The review link has been sent to your client via SMS.',
-  'reviewLinkCopy': 'Review Link (for your reference):',
 
   // Notify Clients
   'notifyClients': 'Notify Clients',
@@ -1335,9 +1205,6 @@ const TRANSLATION_KEYS = {
 
   // Admin Components
   'neverMissAnImportantUpdate': 'Never Miss an Important Update',
-  'all': 'All',
-  'unread': 'Unread',
-  'read': 'Read',
   'notificationDisabled': 'Notification disabled',
   'youHaveNoNotifications': 'You have no {filter} notifications.',
   'appointmentsTrend': 'Appointments Trend',
@@ -1365,7 +1232,6 @@ const TRANSLATION_KEYS = {
   'viewDetails': 'View Details',
   'logoutConfirmation': 'Logout Confirmation',
   'areYouSureLogout': 'Are you sure you want to logout?',
-  'cancel': 'Cancel',
   'logout': 'Logout',
   'notification': 'Notification',
   'notifications': 'Notifications',
@@ -1375,7 +1241,6 @@ const TRANSLATION_KEYS = {
   'unread': 'Unread',
   'read': 'Read',
   'noNotifications': 'No notifications {filter}',
-  'clientReview': 'Client Review',
   'smsSentSuccessfully': 'SMS Sent Successfully',
   'reviewLinkSentToClient': 'Review link sent to client',
   'reviewLinkCopy': 'Review Link (for reference):',
@@ -2212,17 +2077,21 @@ const TRANSLATION_KEYS = {
 
 };
 
+if (typeof window !== 'undefined') {
+  window.__batchTranslationCatalog = { TRANSLATION_KEYS, COMMON_TEXTS };
+}
+
 export const BatchTranslationContext = createContext();
 
 export const BatchTranslationProvider = ({ children }) => {
   const { t } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
-  const [commonTexts, setCommonTexts] = useState({});
+  const [commonTexts] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
   const [autoExtractionEnabled, setAutoExtractionEnabled] = useState(true);
   const [extractedTexts, setExtractedTexts] = useState([]);
-  const [translationsUpdated, setTranslationsUpdated] = useState(0);
+  const [, setTranslationsUpdated] = useState(0);
 
   // Initialize context detection service
   useEffect(() => {
@@ -2280,7 +2149,9 @@ export const BatchTranslationProvider = ({ children }) => {
             });
           }
         }
-      } catch { }
+      } catch {
+        // Ignore cache hydration failures and continue with live hydration.
+      }
       batchTranslationService.ensureTranslationsForCurrentLanguage();
     }, 800);
     return () => clearTimeout(timeoutId);
@@ -2388,7 +2259,9 @@ export const BatchTranslationProvider = ({ children }) => {
     // Save to localStorage immediately
     try {
       localStorage.setItem('youCalendy_selectedLanguage', newLanguage);
-    } catch { }
+    } catch {
+      // Ignore storage write failures; language already changed in memory.
+    }
 
     // Update i18next synchronously (texts are local, should be instant)
     // Use void to explicitly ignore the promise

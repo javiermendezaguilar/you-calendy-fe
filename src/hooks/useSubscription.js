@@ -3,26 +3,14 @@ import { businessAPI } from "../services/businessAPI";
 import { toast } from "sonner";
 import { useBatchTranslation } from "../contexts/BatchTranslationContext";
 import { getCurrentUser } from "../utils/authUtils";
-import custAxios from "../configs/axios.config";
 
 // Get subscription status
 export const useSubscriptionStatus = () => {
-  // Resolve current user via local storage first, then fall back to /auth/me
+  // Protected barber routes are gated by local auth state before mounting.
+  // Hitting /auth/me without that state creates noisy auth/CORS failures in previews.
   const storedUser = getCurrentUser('barber');
-
-  const { data: meData } = useQuery({
-    queryKey: ["me", !!storedUser],
-    queryFn: async () => {
-      const res = await custAxios.get("/auth/me");
-      return res.data?.data; // backend wraps user under data
-    },
-    enabled: !!storedUser === false, // Only fetch if no stored user
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-  });
-
-  const userId = storedUser?._id || storedUser?.id || meData?._id || null;
-  const user = storedUser || meData;
+  const userId = storedUser?._id || storedUser?.id || null;
+  const user = storedUser || null;
 
   return useQuery({
     queryKey: ["subscriptionStatus", userId || "unknown"],
@@ -50,7 +38,7 @@ export const useStartFreeTrial = () => {
       const response = await businessAPI.startFreeTrial();
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(tc("freeTrialStartedSuccessfully"));
   // Invalidate subscription status to refetch
   queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
@@ -68,7 +56,7 @@ export const useCreateSubscription = () => {
   const { tc } = useBatchTranslation();
   
   return useMutation({
-    mutationFn: async ({ priceId, skipToast = false }) => {
+    mutationFn: async ({ priceId }) => {
       try {
         const response = await businessAPI.createStripeSubscription({ priceId });
         return response.data;
@@ -76,25 +64,16 @@ export const useCreateSubscription = () => {
         const status = err?.response?.status;
         const message = err?.response?.data?.message || "";
 
-        // If backend requires starting the trial first, do so and then retry subscription
         if (
           status === 400 &&
           typeof message === "string" &&
           message.toLowerCase().includes("start your free trial first")
         ) {
-          // Attempt to start the free trial
-          try {
-            await businessAPI.startFreeTrial();
-          } catch (startErr) {
-            // If starting the trial fails (e.g., setup incomplete), bubble up that error
-            throw startErr;
-          }
-          // Retry creating the subscription after starting the trial
+          await businessAPI.startFreeTrial();
           const retryResponse = await businessAPI.createStripeSubscription({ priceId });
           return retryResponse.data;
         }
 
-        // For all other errors, bubble up
         throw err;
       }
     },

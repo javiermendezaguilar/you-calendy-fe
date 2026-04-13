@@ -1,15 +1,42 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import HeroSection from "../../components/home/landing/heroSection";
 import Benefit from "../../components/home/landing/Benefit";
 import AdvantagesSection from "../../components/home/landing/Advantages/AdvantagesSection";
-import Footer from "../../components/home/landing/Footer";
-import Testimonials from "../../components/home/landing/Testimonials";
-import Booking from "../../components/home/landing/Booking";
-import AppointmentHistorySection from "../../components/home/landing/BenefitSection/AppointmentHistorySection";
-import BenefitSection from "../../components/home/landing/BenefitSection/BenefitSection";
-import MarketingHero from "../../components/home/landing/Marketing/MarketingHero";
-import MessageComposer from "../../components/home/landing/Marketing/MessageComposer";
-import ClientSection from "../../components/home/landing/ClientPage/ClientSection";
+const Footer = lazy(() => import("../../components/home/landing/Footer"));
+const Booking = lazy(() => import("../../components/home/landing/Booking"));
+const AppointmentHistorySection = lazy(() => import("../../components/home/landing/BenefitSection/AppointmentHistorySection"));
+const BenefitSection = lazy(() => import("../../components/home/landing/BenefitSection/BenefitSection"));
+const MarketingHero = lazy(() => import("../../components/home/landing/Marketing/MarketingHero"));
+const MessageComposer = lazy(() => import("../../components/home/landing/Marketing/MessageComposer"));
+const ClientSection = lazy(() => import("../../components/home/landing/ClientPage/ClientSection"));
+
+const DeferredSection = ({ children, minHeight = 320, rootMargin = "300px 0px" }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (isVisible || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isVisible, rootMargin]);
+
+  return (
+    <div ref={containerRef} style={{ minHeight }}>
+      {isVisible ? <Suspense fallback={null}>{children}</Suspense> : null}
+    </div>
+  );
+};
+
 const LandingPage = () => {
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0, message: "" });
   const hideTimerRef = useRef(null);
@@ -90,26 +117,35 @@ const LandingPage = () => {
       <div id="advantages">
         <AdvantagesSection />
       </div>
-      <main className="flex flex-col items-center w-full min-h-screen bg-white mt-20 p-10 max-md:p-[30px] max-sm:p-5">
-        <div className="flex items-center w-[90%] max-md:w-full max-md:flex-col">
-          <AppointmentHistorySection />
-          <BenefitSection />
-        </div>
-      </main>
-      <main className="flex flex-col min-h-screen bg-white px-10">
-        <div className="flex max-md:flex-col w-[70%] mx-14 max-md:w-full max-md:mx-0">
-          <ClientSection/>
-        </div>
-      </main>
-      <main className="flex flex-col items-center w-full min-h-screen bg-white px-10">
-        <div className="flex w-full max-w-[90%] max-md:max-w-full max-md:flex-col">
-          <MessageComposer />
-          <MarketingHero />
-        </div>
-      </main>
-      <Booking />
-      {/* <Testimonials /> */}
-      <Footer />
+      <DeferredSection minHeight={900}>
+        <main className="flex flex-col items-center w-full min-h-screen bg-white mt-20 p-10 max-md:p-[30px] max-sm:p-5">
+          <div className="flex items-center w-[90%] max-md:w-full max-md:flex-col">
+            <AppointmentHistorySection />
+            <BenefitSection />
+          </div>
+        </main>
+      </DeferredSection>
+      <DeferredSection minHeight={900}>
+        <main className="flex flex-col min-h-screen bg-white px-10">
+          <div className="flex max-md:flex-col w-[70%] mx-14 max-md:w-full max-md:mx-0">
+            <ClientSection />
+          </div>
+        </main>
+      </DeferredSection>
+      <DeferredSection minHeight={900}>
+        <main className="flex flex-col items-center w-full min-h-screen bg-white px-10">
+          <div className="flex w-full max-w-[90%] max-md:max-w-full max-md:flex-col">
+            <MessageComposer />
+            <MarketingHero />
+          </div>
+        </main>
+      </DeferredSection>
+      <DeferredSection minHeight={480}>
+        <Booking />
+      </DeferredSection>
+      <DeferredSection minHeight={240}>
+        <Footer />
+      </DeferredSection>
       {tooltip.visible && (
         <div
           style={{ position: "fixed", left: tooltip.x, top: tooltip.y, transform: "translate(-50%, -120%)", pointerEvents: "none", zIndex: 9999 }}

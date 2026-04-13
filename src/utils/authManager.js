@@ -153,7 +153,7 @@ class AuthManager {
    */
   async validateSessionWithServer() {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/auth/me`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/auth/me`, {
         method: 'GET',
         credentials: 'include', // Send cookies automatically
         headers: {
@@ -280,7 +280,7 @@ class AuthManager {
       // Only log warning, don't treat as critical error
       // User data might be loading or cookies might handle authentication
       
-      const restoration = restoreMissingData(userContext);
+      restoreMissingData(userContext);
       
       // Don't log error - missing user data is not critical since cookies handle auth
     }

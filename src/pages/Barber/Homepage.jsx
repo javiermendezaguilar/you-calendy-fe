@@ -1,9 +1,11 @@
-import React from "react";
-import Footer from "../../components/home/landing/Footer";
+import React, { Suspense, lazy } from "react";
 import { Home } from "./Home";
-import Gallery from "./Gallery";
 import { motion } from "framer-motion";
-import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
+
+const MotionDiv = motion.div;
+
+const Footer = lazy(() => import("../../components/home/landing/Footer"));
+const Gallery = lazy(() => import("./Gallery"));
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -13,14 +15,9 @@ const pageVariants = {
 };
 
 const Homepage = () => {
-  const { tc } = useBatchTranslation();
-  
-
-
-
   return (
     <div>
-      <motion.div
+      <MotionDiv
         initial="initial"
         animate="animate"
         variants={pageVariants}
@@ -30,11 +27,15 @@ const Homepage = () => {
           <Home />
         </div>
         <div className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[78%] mx-auto">
-          <Gallery />
+          <Suspense fallback={null}>
+            <Gallery />
+          </Suspense>
         </div>
-      </motion.div>
+      </MotionDiv>
 
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };

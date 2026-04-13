@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
-import Footer from "../../components/home/landing/Footer";
 import { Home } from "./Home";
-import Gallery from "./Gallery";
-import ClientProfile from "./ClientProfile";
 import { motion, AnimatePresence } from "framer-motion";
 import { getClientByInvitationToken } from '../../services/clientAPI';
 import { clearInvitationToken } from '../../utils/invitationUtils';
 import { toast } from 'sonner';
-import ProfileCompletionModal from '../../components/client/ProfileCompletionModal';
-import WelcomeBackModal from '../../components/client/WelcomeBackModal';
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
+
+const MotionDiv = motion.div;
+
+const Footer = lazy(() => import("../../components/home/landing/Footer"));
+const Gallery = lazy(() => import("./Gallery"));
+const LazyClientProfile = lazy(() => import("./ClientProfile"));
+const ProfileCompletionModal = lazy(() => import('../../components/client/ProfileCompletionModal'));
+const WelcomeBackModal = lazy(() => import('../../components/client/WelcomeBackModal'));
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -21,7 +24,7 @@ const pageVariants = {
 
 const Homepage = () => {
   const { tc } = useBatchTranslation();
-  const [activeTab, setActiveTab] = useOutletContext();
+  const [activeTab] = useOutletContext();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [clientData, setClientData] = useState(null);
@@ -179,7 +182,7 @@ const Homepage = () => {
     <div>
       <AnimatePresence mode="wait">
         {activeTab === "appointments" && (
-          <motion.div
+          <MotionDiv
             key="appointments"
             initial="initial"
             animate="animate"
@@ -191,13 +194,15 @@ const Homepage = () => {
               <Home />
             </div>
             <div className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[78%] mx-auto">
-              <Gallery />
+              <Suspense fallback={null}>
+                <Gallery />
+              </Suspense>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
 
         {activeTab === "profile" && (
-          <motion.div
+          <MotionDiv
             key="profile"
             initial="initial"
             animate="animate"
@@ -205,25 +210,35 @@ const Homepage = () => {
             variants={pageVariants}
             transition={pageVariants.transition}
           >
-            <ClientProfile />
-          </motion.div>
+            <Suspense fallback={null}>
+              <LazyClientProfile />
+            </Suspense>
+          </MotionDiv>
         )}
       </AnimatePresence>
 
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
       
-      {/* Profile Completion Modal */}
-      <ProfileCompletionModal
-        show={showProfileModal}
-        onClose={handleModalClose}
-        onComplete={handleProfileComplete}
-      />
+      {showProfileModal ? (
+        <Suspense fallback={null}>
+          <ProfileCompletionModal
+            show={showProfileModal}
+            onClose={handleModalClose}
+            onComplete={handleProfileComplete}
+          />
+        </Suspense>
+      ) : null}
       
-      {/* Welcome Back Modal */}
-      <WelcomeBackModal
-        show={showWelcomeModal}
-        onClose={() => setShowWelcomeModal(false)}
-      />
+      {showWelcomeModal ? (
+        <Suspense fallback={null}>
+          <WelcomeBackModal
+            show={showWelcomeModal}
+            onClose={() => setShowWelcomeModal(false)}
+          />
+        </Suspense>
+      ) : null}
     </div>
   );
 };

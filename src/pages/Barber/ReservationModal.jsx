@@ -1,23 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, Upload, Mail, Plus } from 'lucide-react';
-import { Calendar, USFlagIcon, GoogleIcon, FacebookIcon } from '../../components/common/Svgs';
-import { Button, TextInput, Checkbox, Textarea, Group, Box } from '@mantine/core';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Button, Textarea } from '@mantine/core';
 import CommonModal from '../../components/common/CommonModal';
 import { UploadIcon } from '../../components/common/Svgs';
 import { toast } from 'sonner';
 import { DatePicker } from '@mantine/dates';
-import { Calendar as CalendarIcon } from 'lucide-react';
 import { useGetAvailableSlots } from '../../hooks/useAppointments';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import { useGetActiveFlashSales, useGetActivePromotions } from '../../hooks/useMarketing';
-import { useMemo } from 'react';
-import { clientAPI } from '../../services/clientAPI';
+import { clientAPI, clientLogin } from '../../services/clientAPI';
 
 // Day names will be translated using tc() function in the component
 // daysOfWeekData removed as it's not used in the component
-
-const leftArrowImage = '/assets/left-arrow.svg'; 
-const rightArrowImage = '/assets/right-arrow.svg';
 
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
@@ -68,7 +62,7 @@ const formatDateObject = (date, normalizedPreference = '24h') => {
 
 // timeSlots will be replaced by dynamic availableSlots from API
 
-const PersonalizeView = ({ onBack, onSkip, onConfirm, service, day, time, total, duration, selectedDate, isBooking }) => {
+const PersonalizeView = ({ onSkip, onConfirm, isBooking }) => {
   const { tc } = useBatchTranslation();
   const [photos, setPhotos] = useState([]);
   const [instructions, setInstructions] = useState('');
@@ -356,7 +350,6 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
   });
 
   const [staffInfo, setStaffInfo] = useState(null);
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
 
@@ -486,7 +479,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
   }, [selectedDate]);
 
   // Calculate discount based on flash sale or happy hour
-  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace('$', '')) : parseFloat(service.price)) : 15.00;
+  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace(/\$/g, '')) : parseFloat(service.price)) : 15.00;
   
   const discountInfo = useMemo(() => {
     // Early return if required data is missing
@@ -622,15 +615,13 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       const client = response.data?.data || response.data;
       
       if (client) {
-        setIsProfileComplete(client.isProfileComplete || false);
-        
         // Extract and store staff information if available
         if (client.staff) {
           setStaffInfo(client.staff);
           localStorage.setItem('clientStaffId', client.staff._id);
         }
       }
-    } catch (error) {
+    } catch {
       // Silently handle error
     } finally {
       setIsLoadingProfile(false);
@@ -696,7 +687,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
               
               // Since we don't have an invitation token, we'll try a different approach
               // Use the client endpoint that might create a client in the context of a business
-              const clientResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/api/client/complete-profile`, {
+              const clientResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/api/client/complete-profile`, {
                 method: 'POST',
                 credentials: 'include', // Important: Include cookies to receive clientToken cookie
                 body: clientFormData
@@ -729,9 +720,8 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                 
                 // Ensure client is logged in to get the cookie (if not already set by complete-profile)
                 try {
-                  const { clientLogin } = await import('../../services/clientAPI');
                   await clientLogin(clientId);
-                } catch (loginError) {
+                } catch {
                   // Continue anyway - cookie might already be set from complete-profile
                 }
               } else {
@@ -739,7 +729,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                 // This is a fallback that creates client data as part of appointment creation
                 clientId = `temp_${Date.now()}_${pendingClientData.email}`;
               }
-            } catch (clientError) {
+            } catch {
               // Use temporary ID for now, appointment creation might handle client creation
               clientId = `temp_${Date.now()}_${pendingClientData.email}`;
             }
@@ -776,7 +766,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       formData.append('clientNotes', selectedPastHaircut || '');
       
       // Append reference photos
-      photos.forEach((photo, index) => {
+      photos.forEach((photo) => {
         if (photo.file) {
           formData.append('referencePhotos', photo.file);
         }
@@ -789,9 +779,8 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         // Ensure client is logged in to get the cookie before booking
         if (clientId) {
           try {
-            const { clientLogin } = await import('../../services/clientAPI');
             await clientLogin(clientId);
-          } catch (loginError) {
+          } catch {
             // Continue anyway - cookie might already be set
           }
         }
@@ -813,7 +802,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         } else if (!clientJustCreated) {
           // For existing clients, check their appointment history
           try {
-            const checkResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments?limit=1&_t=${Date.now()}`, {
+            const checkResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments?limit=1&_t=${Date.now()}`, {
               method: 'GET',
               credentials: 'include',
               cache: 'no-cache',
@@ -839,14 +828,14 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
               // If check fails, assume first appointment for safety
               isFirstAppointment = true;
             }
-          } catch (error) {
+          } catch {
             // If check fails, assume it might be first appointment (safer to show message)
             isFirstAppointment = true;
           }
         }
         
         // Use the regular appointments endpoint with cookie-based authentication
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments`, {
           method: 'POST',
           credentials: 'include', // Important: Include cookies (clientToken) in the request
           body: formData
@@ -862,7 +851,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
           // This is the most reliable way to determine if this was the first appointment
           setTimeout(async () => {
             try {
-              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/appointments?limit=2&_t=${Date.now()}`, {
+              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/appointments?limit=2&_t=${Date.now()}`, {
                 method: 'GET',
                 credentials: 'include',
                 cache: 'no-cache',
@@ -929,7 +918,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                   }
                 }
               }
-            } catch (error) {
+            } catch {
               // If verification fails but we thought it was first, show message anyway
               if (isFirstAppointment) {
                 const registrationMessage = tc('registeredAsClientCanAccessProfile') || 
@@ -956,7 +945,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       
       // This should not happen in barber profile flow
       toast.error(tc('invalidBookingFlow'));
-    } catch (error) {
+    } catch {
       toast.error(tc('errorOccurredBookingAppointment'));
     } finally {
       setIsBooking(false);

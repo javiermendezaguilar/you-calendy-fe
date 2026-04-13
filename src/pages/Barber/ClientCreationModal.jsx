@@ -6,7 +6,7 @@ import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
+const ClientCreationModal = ({ show, onClose, onClientCreated }) => {
   const { tc } = useBatchTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,7 +26,9 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
         try {
           const barberData = JSON.parse(publicBarberData);
           publicBusinessId = barberData?.business?._id || barberData?.businessId;
-        } catch {}
+        } catch {
+          // Ignore invalid cached public barber data.
+        }
       }
     }
     const savedKey = publicBusinessId ? `clientAutoFill:${publicBusinessId}` : 'clientAutoFill';
@@ -43,7 +45,9 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
         if (obj.countryIso) {
           setDefaultCountry(String(obj.countryIso).toLowerCase());
         }
-      } catch {}
+      } catch {
+        // Ignore invalid cached autofill data.
+      }
     } else {
       const detectCountryByIP = async () => {
         try {
@@ -56,7 +60,9 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
               return;
             }
           }
-        } catch {}
+        } catch {
+          // Ignore primary geolocation failures and fall back.
+        }
         try {
           const r2 = await fetch('https://ipwho.is/?fields=country_code');
           if (r2.ok) {
@@ -67,7 +73,9 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
               return;
             }
           }
-        } catch {}
+      } catch {
+        // Ignore secondary geolocation failures and fall back to locale.
+      }
         const locale = navigator.language || (Array.isArray(navigator.languages) && navigator.languages[0]) || '';
         const parts = String(locale).split('-');
         const region = parts[1] || parts[0];
@@ -134,7 +142,7 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
           try {
             const barberData = JSON.parse(publicBarberData);
             publicBusinessId = barberData?.business?._id || barberData?.businessId;
-          } catch (e) {
+          } catch {
             // Silently handle parse error
           }
         }
@@ -155,7 +163,7 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
       };
 
       // Use the public client creation endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app'}/business/client-profiles`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.groomnest.com'}/business/client-profiles`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -198,14 +206,16 @@ const ClientCreationModal = ({ show, onClose, onClientCreated, service }) => {
             phone: clientData.phone,
             countryIso: defaultCountry
           }));
-        } catch {}
+        } catch {
+          // Ignore autofill persistence failures.
+        }
         
         toast.success(tc('detailsSavedSuccessfully'));
         onClientCreated(clientInfo);
       } else {
         toast.error(result.message || tc('failedToSaveDetails'));
       }
-    } catch (error) {
+    } catch {
       toast.error(tc('errorSavingDetails'));
     } finally {
       setIsCreating(false);

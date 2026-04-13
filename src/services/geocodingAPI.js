@@ -352,31 +352,6 @@ const INSTANT_CITIES_CACHE = new Map([
   ['canberra', { value: 'Canberra, Australia', label: 'Canberra, Australia', coordinates: [-35.2809, 149.1300], cached: true, score: 90 }],
 ]);
 
-// Fuzzy search implementation
-const fuzzyMatch = (query, text, threshold = 0.6) => {
-  const queryLower = query.toLowerCase();
-  const textLower = text.toLowerCase();
-  
-  // Exact match gets highest score
-  if (textLower.includes(queryLower)) {
-    return 1.0;
-  }
-  
-  // Simple fuzzy matching algorithm
-  let score = 0;
-  let queryIndex = 0;
-  
-  for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
-    if (textLower[i] === queryLower[queryIndex]) {
-      score++;
-      queryIndex++;
-    }
-  }
-  
-  const fuzzyScore = score / queryLower.length;
-  return fuzzyScore >= threshold ? fuzzyScore : 0;
-};
-
 // Levenshtein distance for better fuzzy matching
 const levenshteinDistance = (str1, str2) => {
   const matrix = [];
@@ -478,7 +453,7 @@ const advancedFuzzyMatch = (query, text) => {
     'ade': 'adelaide',
     'mum': 'mumbai',
     'del': 'delhi',
-    'ban': 'bangalore',
+    'blr': 'bangalore',
     'hyd': 'hyderabad',
     'che': 'chennai',
     'kol': 'kolkata',
@@ -520,7 +495,7 @@ const advancedFuzzyMatch = (query, text) => {
     'bue': 'buenos aires',
     'lim': 'lima',
     'bog': 'bogota',
-    'san': 'santiago',
+    'stg': 'santiago',
     'car': 'caracas',
     'qui': 'quito',
     // Spanish city abbreviations
@@ -546,7 +521,7 @@ const advancedFuzzyMatch = (query, text) => {
     'our': 'ourense',
     'pon': 'pontevedra',
     'ceu': 'ceuta',
-    'mel': 'melilla'
+    'mll': 'melilla'
   };
   
   // Check for abbreviation matches
@@ -707,7 +682,6 @@ searchAnalytics.loadFromLocalStorage();
  * Smart API selection based on performance metrics
  */
 const selectBestAPI = () => {
-  const now = Date.now();
   const apis = Object.keys(apiPerformance);
   
   // Sort by performance score (success rate * speed factor)
@@ -768,7 +742,7 @@ const searchWithMultipleAPIs = async (query, limit = 8) => {
     return results;
     
   } catch (error) {
-    console.error(`Error with ${selectedAPI}:`, error);
+    console.error('Geocoding API error', { api: selectedAPI, error });
     updateAPIPerformance(selectedAPI, Date.now() - startTime, false);
     
     // Try fallback APIs
@@ -781,7 +755,10 @@ const searchWithMultipleAPIs = async (query, limit = 8) => {
           return results;
         }
       } catch (fallbackError) {
-        console.error(`Fallback API ${api} failed:`, fallbackError);
+        console.error('Fallback geocoding API failed', {
+          api,
+          error: fallbackError,
+        });
         updateAPIPerformance(api, Date.now() - startTime, false);
       }
     }
@@ -945,7 +922,11 @@ const getInstantSuggestions = (query, limit = 5, context = {}) => {
     .sort((a, b) => b.finalScore - a.finalScore)
     .slice(0, limit)
     .forEach(result => {
-      const { matchScore, matchType, rankingScore, finalScore, ...city } = result;
+      const city = { ...result };
+      delete city.matchScore;
+      delete city.matchType;
+      delete city.rankingScore;
+      delete city.finalScore;
       results.push(city);
     });
   
@@ -1131,7 +1112,7 @@ export const reverseGeocodeAPI = async (lat, lon) => {
  */
 export const debouncedSearchCities = (() => {
   let timeoutId;
-  return (query, limit, delay = 100) => {
+  return (query, limit) => {
     return new Promise((resolve) => {
       clearTimeout(timeoutId);
       
@@ -1204,7 +1185,7 @@ export const getCachedCitySuggestions = (query, limit = 10) => {
  * Smart search with context awareness
  */
 export const smartSearchCities = async (query, context = {}) => {
-  const { country, region, limit = 8 } = context;
+  const { country, limit = 8 } = context;
   
   // If we have country context, prioritize cities from that country
   if (country) {

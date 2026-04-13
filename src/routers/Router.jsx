@@ -1,82 +1,85 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
-import LandingPage from "../pages/home/LandingPage";
+import AdminProtectedRoute from "../components/admin/AdminProtectedRoute";
+import BarberProtectedRoute from "../components/barber/BarberProtectedRoute";
+import BrandLoader from "../components/common/BrandLoader";
 import HomeLayout from "../layouts/HomeLayout";
+import LandingPage from "../pages/home/LandingPage";
 import Login from "../pages/Auth/Login";
 import Registration from "../pages/Auth/Registration";
-import Configuration from "../pages/Address/Configuration";
-import Location from "../pages/Address/Location";
-import Details from "../pages/Auth/Details";
-import Businesshour from "../pages/Business-Hours/Businesshour";
-import Services from "../pages/Services/services";
-import Plan from "../pages/Welcome/Plan";
-import Welcome from "../pages/Welcome/welcome";
-import Appointment from "../pages/Dashboard/Appointment";
-import DashboardLayout from "../layouts/DashboardLayout";
-import ClientLayout from "../layouts/ClientLayout";
-import ClientHomepage from "../pages/Client/Homepage";
-import ClientProfile from "../pages/Client/ClientProfile";
-import InvitationRedirect from "../components/InvitationRedirect";
-import CreateAppointment from "../pages/Dashboard/CreateAppointment";
-import Profile from "../pages/Profile/profile";
-import PublicBarberProfile from "../pages/Barber/PublicBarberProfile";
-import BusinessSettings from "../pages/Business-Settings/businessSettings";
-import BusinessDetail from "../pages/Business-Settings/businessDetails";
-import ServiceSetup from "../pages/Business-Settings/serviceSetup";
-import AddServices from "../pages/Business-Settings/addServices";
-import BusinessInfo from "../pages/Business-Settings/BusinessInfo";
-import EditBusinessHours from "../pages/Business-Settings/EditBusinessHours";
-import ProfileImages from "../pages/Business-Settings/profileimages";
-import LocationPage from "../pages/Business-Settings/LocationPage";
-import AutomatedReminders from "../pages/Business-Settings/AutomatedReminders";
-import SuggestFeature from "../pages/Suggest-Feature/suggest-feature";
-import Marketing from "../pages/Dashboard/Marketing";
-import MessageBlast from "../pages/Dashboard/MessageBlast";
-import Promotion from "../pages/Dashboard/Promotion";
-import FlashSale from "../pages/Dashboard/FlashSale";
-import AddYourClients from "../pages/Client-Section/AddyourClients";
-import EditClient from "../pages/Client-Section/EditClient";
-import ClientSection from "../pages/Client-Section/ClientSection";
-import StaffManagement from "../pages/Staff-Management/StaffManagement";
-import AddStaffMember from "../pages/Staff-Management/AddStaffMember";
-import EditStaffMember from "../pages/Staff-Management/EditStaffMember";
-import HappyHours from "../pages/Dashboard/HappyHours";
-import Tickets from "../pages/Support/Ticket";
-import CreateTicket from "../pages/Support/CreateTicket";
-import AppointmentHistory from "../pages/Appointment-History/AppointmentHistory";
-import ProfileSetting from "../pages/Profile-Setting/ProfileSetting";
-import ClientsNote from "../pages/ClientsNote/ClientsNote";
-import AdminDashboard from "../pages/Admin/AdminDashboard";
-import AdminLayout from "../layouts/AdminLayout";
-import BarberManagement from "../pages/Admin/BarberManagement";
-import ClientManagement from "../pages/Admin/ClientManagement";
-import CreditManagement from "../pages/Admin/CreditManagement";
-import UserClientManagement from "../pages/Client-Section/ClientManagement";
-import SubscriptionManagement from "../pages/Admin/SubscriptionManagement";
-import AdminProfile from "../pages/Admin/AdminProfile";
-import BarberProfile from "../pages/Admin/BarberProfile";
-import Support from "../pages/Admin/Support";
-import Security from "../pages/Admin/Security";
-import ProposedInterfaces from "../pages/Admin/ProposedInterfaces";
-import HelpCenter from "../pages/Support/HelpCenter";
-import TermsAndConditions from "../pages/Support/TermsAndConditions";
-import PrivacyPolicy from "../pages/Support/PrivacyPolicy";
+const Configuration = lazy(() => import("../pages/Address/Configuration"));
+const Location = lazy(() => import("../pages/Address/Location"));
+const Details = lazy(() => import("../pages/Auth/Details"));
+const Businesshour = lazy(() => import("../pages/Business-Hours/Businesshour"));
+const Services = lazy(() => import("../pages/Services/services"));
+const Plan = lazy(() => import("../pages/Welcome/Plan"));
+const Welcome = lazy(() => import("../pages/Welcome/welcome"));
+const ClientLayout = lazy(() => import("../layouts/ClientLayout"));
+const ClientHomepage = lazy(() => import("../pages/Client/Homepage"));
+const ClientProfile = lazy(() => import("../pages/Client/ClientProfile"));
+const InvitationRedirect = lazy(() => import("../components/InvitationRedirect"));
+const Profile = lazy(() => import("../pages/Profile/profile"));
+const PublicBarberProfile = lazy(() => import("../pages/Barber/PublicBarberProfile"));
+const UserClientManagement = lazy(() => import("../pages/Client-Section/ClientManagement"));
+const HelpCenter = lazy(() => import("../pages/Support/HelpCenter"));
+const TermsAndConditions = lazy(() => import("../pages/Support/TermsAndConditions"));
+const PrivacyPolicy = lazy(() => import("../pages/Support/PrivacyPolicy"));
 import AdminLogin from "../pages/Auth/AdminLogin";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import ResetPassword from "../pages/Auth/ResetPassword";
-import AdminProtectedRoute from "../components/admin/AdminProtectedRoute";
-import BarberProtectedRoute from "../components/barber/BarberProtectedRoute";
-import SessionExpired from "../pages/SessionExpired";
-import PaymentPage from "../pages/Payment/PaymentPage";
-import PaymentSuccess from "../pages/Payment/PaymentSuccess";
-import PaymentFailure from "../pages/Payment/PaymentFailure";
-import PurchaseCredits from "../pages/Dashboard/PurchaseCredits";
-import CreditSuccess from "../pages/Billing/CreditSuccess";
-import SubscriptionRequired from "../pages/Subscription/SubscriptionRequired";
-import SubscriptionStatus from "../pages/Dashboard/SubscriptionStatus";
+const SessionExpired = lazy(() => import("../pages/SessionExpired"));
+const PaymentPage = lazy(() => import("../pages/Payment/PaymentPage"));
+const PaymentSuccess = lazy(() => import("../pages/Payment/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("../pages/Payment/PaymentFailure"));
+const DashboardLayout = lazy(() => import("../layouts/DashboardLayout"));
+const Appointment = lazy(() => import("../pages/Dashboard/Appointment"));
+const CreateAppointment = lazy(() => import("../pages/Dashboard/CreateAppointment"));
+const BusinessSettings = lazy(() => import("../pages/Business-Settings/businessSettings"));
+const BusinessDetail = lazy(() => import("../pages/Business-Settings/businessDetails"));
+const ServiceSetup = lazy(() => import("../pages/Business-Settings/serviceSetup"));
+const AddServices = lazy(() => import("../pages/Business-Settings/addServices"));
+const BusinessInfo = lazy(() => import("../pages/Business-Settings/BusinessInfo"));
+const EditBusinessHours = lazy(() => import("../pages/Business-Settings/EditBusinessHours"));
+const ProfileImages = lazy(() => import("../pages/Business-Settings/profileimages"));
+const LocationPage = lazy(() => import("../pages/Business-Settings/LocationPage"));
+const AutomatedReminders = lazy(() => import("../pages/Business-Settings/AutomatedReminders"));
+const SuggestFeature = lazy(() => import("../pages/Suggest-Feature/suggest-feature"));
+const Marketing = lazy(() => import("../pages/Dashboard/Marketing"));
+const MessageBlast = lazy(() => import("../pages/Dashboard/MessageBlast"));
+const Promotion = lazy(() => import("../pages/Dashboard/Promotion"));
+const FlashSale = lazy(() => import("../pages/Dashboard/FlashSale"));
+const AddYourClients = lazy(() => import("../pages/Client-Section/AddyourClients"));
+const EditClient = lazy(() => import("../pages/Client-Section/EditClient"));
+const ClientSection = lazy(() => import("../pages/Client-Section/ClientSection"));
+const StaffManagement = lazy(() => import("../pages/Staff-Management/StaffManagement"));
+const AddStaffMember = lazy(() => import("../pages/Staff-Management/AddStaffMember"));
+const EditStaffMember = lazy(() => import("../pages/Staff-Management/EditStaffMember"));
+const HappyHours = lazy(() => import("../pages/Dashboard/HappyHours"));
+const Tickets = lazy(() => import("../pages/Support/Ticket"));
+const CreateTicket = lazy(() => import("../pages/Support/CreateTicket"));
+const AppointmentHistory = lazy(() => import("../pages/Appointment-History/AppointmentHistory"));
+const ProfileSetting = lazy(() => import("../pages/Profile-Setting/ProfileSetting"));
+const ClientsNote = lazy(() => import("../pages/ClientsNote/ClientsNote"));
+const PurchaseCredits = lazy(() => import("../pages/Dashboard/PurchaseCredits"));
+const CreditSuccess = lazy(() => import("../pages/Billing/CreditSuccess"));
+const SubscriptionRequired = lazy(() => import("../pages/Subscription/SubscriptionRequired"));
+const SubscriptionStatus = lazy(() => import("../pages/Dashboard/SubscriptionStatus"));
+const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
+const AdminDashboard = lazy(() => import("../pages/Admin/AdminDashboard"));
+const BarberManagement = lazy(() => import("../pages/Admin/BarberManagement"));
+const ClientManagement = lazy(() => import("../pages/Admin/ClientManagement"));
+const CreditManagement = lazy(() => import("../pages/Admin/CreditManagement"));
+const SubscriptionManagement = lazy(() => import("../pages/Admin/SubscriptionManagement"));
+const AdminProfile = lazy(() => import("../pages/Admin/AdminProfile"));
+const BarberProfile = lazy(() => import("../pages/Admin/BarberProfile"));
+const Support = lazy(() => import("../pages/Admin/Support"));
+const Security = lazy(() => import("../pages/Admin/Security"));
+const ProposedInterfaces = lazy(() => import("../pages/Admin/ProposedInterfaces"));
 
 const Router = () => {
   return (
-    <Routes>
+    <Suspense fallback={<BrandLoader label="Loading" fullscreen />}>
+      <Routes>
       <Route path="/" element={<HomeLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/help-center" element={<HelpCenter />} />
@@ -267,7 +270,8 @@ const Router = () => {
       {/* Session expired route */}
       <Route path="/session-expired" element={<SessionExpired />} />
       <Route path="/client-session-expired" element={<SessionExpired />} />
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 };
 

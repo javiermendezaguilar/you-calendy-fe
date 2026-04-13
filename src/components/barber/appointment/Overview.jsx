@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ReactApexChart from "react-apexcharts";
 import {
   AppointmentIcon,
 } from "../../common/Svgs";
@@ -10,6 +9,7 @@ import { FaCalendarAlt, FaInfoCircle, FaPercentage } from "react-icons/fa";
 import { useGetDashboardStats } from "../../../hooks/useAppointments";
 import { useBatchTranslation } from "../../../contexts/BatchTranslationContext";
 import dayjs from "dayjs";
+import SimpleDonutChart from "../../common/charts/SimpleDonutChart";
 
 // Agenda Occupancy Card Component
 const AgendaOccupancyCard = ({
@@ -99,69 +99,12 @@ const AppointmentStatusCard = ({
   total,
   tooltips,
   tc,
-  currentLanguage,
 }) => {
-  const chartOptions = {
-    chart: {
-      type: "donut",
-      height: 200,
-    },
-    labels: [tc("finished"), tc("cancelled"), tc("noShows")],
-    colors: ["#00BE70", "#FF6B6B", "#FFB347"],
-    legend: {
-      show: false,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: "65%",
-          labels: {
-            show: true,
-            name: {
-              show: false,
-            },
-            value: {
-              show: true,
-              fontSize: "18px",
-              fontWeight: 600,
-              formatter: () => total,
-            },
-            total: {
-              show: true,
-              label: tc("total"),
-              fontSize: "12px",
-              formatter: () => total,
-            },
-          },
-        },
-      },
-    },
-    tooltip: {
-      enabled: true,
-      y: {
-        formatter: (val) => {
-          const percentage =
-            total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-          return `${val} (${percentage}%)`;
-        },
-      },
-    },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            height: 180,
-          },
-        },
-      },
-    ],
-  };
-
-  const chartSeries = [finished.count, cancelled.count, noShow.count];
+  const chartSegments = [
+    { label: tc("finished"), value: finished.count, color: "#00BE70" },
+    { label: tc("cancelled"), value: cancelled.count, color: "#FF6B6B" },
+    { label: tc("noShows"), value: noShow.count, color: "#FFB347" },
+  ];
 
   // Status item renderer
   const StatusItem = ({ label, count, percentage, change, color, tooltip }) => {
@@ -222,11 +165,12 @@ const AppointmentStatusCard = ({
         {/* Donut Chart */}
         <div className="flex items-center justify-center">
           {total > 0 ? (
-            <ReactApexChart
-              options={chartOptions}
-              series={chartSeries}
-              type="donut"
-              height={180}
+            <SimpleDonutChart
+              segments={chartSegments}
+              total={total}
+              centerLabel={tc("total")}
+              size={180}
+              emptyLabel={tc("noDataAvailable")}
             />
           ) : (
             <div className="text-center text-gray-500 py-8">
@@ -435,7 +379,6 @@ const Overview = ({ selectedDate, onDateChange, staffId, onStaffChange }) => {
         {/* Appointment Status (Finished, Cancelled, No-Show) */}
         <AppointmentStatusCard
           key={`status-chart-${currentLanguage}-${internalStaffId}-${month}-${year}`}
-          currentLanguage={currentLanguage}
           finished={{
             count: data?.appointmentStatus?.finished?.count || 0,
             percentage: data?.appointmentStatus?.finished?.percentage || 0,

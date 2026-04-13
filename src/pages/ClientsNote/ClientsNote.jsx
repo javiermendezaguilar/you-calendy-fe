@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Textarea, Tabs, Skeleton } from "@mantine/core";
 import CommonModal from "../../components/common/CommonModal";
 import { businessAPI } from "../../services/businessAPI";
-import customer from "../../assets/profile-image.png";
-import ClientNote1 from "../../assets/clients-note1.png";
-import ClientNote2 from "../../assets/clients-note2.png";
-import ClientNote3 from "../../assets/clients-note3.png";
+import customer from "../../assets/customer.webp";
 import { SendClientNoteIcon, ViewNoteIcon, StartIcon } from "../../components/common/Svgs";
 import { X } from "tabler-icons-react";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
@@ -152,7 +149,7 @@ const NoteViewContent = ({ clientData, activeTab, onClose, onUpdated }) => {
     try {
       setSending(true);
       // For reports we can optionally include a status; keep minimal and only send response
-      const res = await businessAPI.respondToClientNote(clientData.id, { response: trimmed });
+      await businessAPI.respondToClientNote(clientData.id, { response: trimmed });
       toast.success(tc('responseSent') || 'Response sent');
       setReply("");
       // Update local item so chat shows immediately

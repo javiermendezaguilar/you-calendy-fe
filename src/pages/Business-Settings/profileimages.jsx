@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Image, FileButton, Button } from "@mantine/core";
 import { useForm } from '@mantine/form';
@@ -260,10 +260,10 @@ const ProfileImages = () => {
 
             navigate(-1);
           },
-          onError: (error) => {
-            const errorMessage = error?.response?.data?.message || error.message || 'Unknown error';
-            toast.error(`Failed to save images: ${errorMessage}`);
-          }
+        onError: (error) => {
+          const errorMessage = error?.response?.data?.message || error.message || 'Unknown error';
+          toast.error(`Failed to save images: ${errorMessage}`);
+        }
         });
       } else {
         notifications.show({
@@ -315,7 +315,7 @@ const ProfileImages = () => {
         onSuccess: () => {
           toast.success('Workplace photo removed successfully!');
         },
-        onError: (error) => {
+        onError: () => {
           toast.error('Failed to remove workplace photo');
           // Revert on error - the query invalidation will refetch the correct state
         }
@@ -344,7 +344,7 @@ const ProfileImages = () => {
         onSuccess: () => {
           toast.success('Logo removed successfully!');
         },
-        onError: (error) => {
+        onError: () => {
           toast.error('Failed to remove logo');
           // The query invalidation will refetch the correct state
         }
@@ -440,13 +440,13 @@ const ProfileImages = () => {
           onSuccess: () => {
             toast.success('Image removed successfully!');
           },
-          onError: (error) => {
+          onError: () => {
             // Revert on error - refetch from server
             toast.error('Failed to remove image');
             // The query invalidation will refetch the correct state
           }
         });
-      } catch (error) {
+      } catch {
         toast.error('Failed to remove image');
         return;
       }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://you-calendy-be.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.groomnest.com';
 
 class GoogleAnalyticsConfigService {
   constructor() {
@@ -15,9 +15,13 @@ class GoogleAnalyticsConfigService {
     const adminToken = localStorage.getItem('adminToken');
     const regularToken = localStorage.getItem('token');
     const token = adminToken || regularToken;
-    
+
+    if (!token || token === 'undefined' || token === 'null') {
+      return null;
+    }
+
     return {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
   }
@@ -29,6 +33,14 @@ class GoogleAnalyticsConfigService {
    */
   async saveConfiguration(measurementId, metadata = {}) {
     try {
+      const headers = this.getAuthHeaders();
+      if (!headers) {
+        return {
+          success: false,
+          error: 'Authentication required for GA configuration'
+        };
+      }
+
       const response = await axios.put(
         this.baseURL,
         {
@@ -40,7 +52,7 @@ class GoogleAnalyticsConfigService {
           }
         },
         {
-          headers: this.getAuthHeaders()
+          headers
         }
       );
 
@@ -62,8 +74,16 @@ class GoogleAnalyticsConfigService {
    */
   async getConfiguration() {
     try {
+      const headers = this.getAuthHeaders();
+      if (!headers) {
+        return {
+          success: false,
+          error: 'Admin privileges required for GA configuration'
+        };
+      }
+
       const response = await axios.get(this.baseURL, {
-        headers: this.getAuthHeaders()
+        headers
       });
 
       return {
@@ -117,6 +137,14 @@ class GoogleAnalyticsConfigService {
    */
   async removeConfiguration() {
     try {
+      const headers = this.getAuthHeaders();
+      if (!headers) {
+        return {
+          success: false,
+          error: 'Authentication required for GA configuration'
+        };
+      }
+
       const response = await axios.put(
         this.baseURL,
         {
@@ -127,7 +155,7 @@ class GoogleAnalyticsConfigService {
           }
         },
         {
-          headers: this.getAuthHeaders()
+          headers
         }
       );
 

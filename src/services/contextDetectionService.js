@@ -140,6 +140,41 @@ class ContextDetectionService {
     return categories[context] || [];
   }
 
+  // Provide a minimal fallback set when no page texts have been registered yet
+  getContextSpecificTexts(context = this.currentContext) {
+    const textsByContext = {
+      BARBER: [
+        'Dashboard',
+        'Appointments',
+        'Clients',
+        'Marketing',
+        'Staff',
+        'Support',
+      ],
+      BARBER_PROFILE: [
+        'Book appointment',
+        'Services',
+        'Gallery',
+        'Reviews',
+      ],
+      ADMIN: [
+        'Admin Dashboard',
+        'Barber Management',
+        'Client Management',
+        'Support',
+      ],
+      CLIENT: [
+        'Profile',
+        'Appointments',
+        'Notifications',
+        'Gallery',
+      ],
+      PUBLIC: [],
+    };
+
+    return textsByContext[context] || [];
+  }
+
   // Check if a text belongs to current context
   isTextRelevantToContext(text, context = this.currentContext) {
     if (context === 'PUBLIC') {

@@ -17,8 +17,8 @@ import {
   useDeleteClientProfile
 } from '../../hooks/useClientProfile'
 import { getClientByInvitationToken } from '../../services/clientAPI'
-import haircut1 from '../../assets/haircut1.png'
-import bg from '../../assets/backbg.png'
+import haircut1 from '../../assets/haircut.webp'
+import bg from '../../assets/background.webp'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -35,6 +35,9 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
 };
+
+const MotionDiv = motion.div;
+const MotionHeader = motion.header;
 
 const ClientProfile = () => {
   const { tc } = useBatchTranslation();
@@ -75,9 +78,9 @@ const ClientProfile = () => {
                 
                 storedClientId = fetchedClientId;
               }
-            } catch (error) {
-              console.error('Error fetching client data from URL invitation token:', error);
-            }
+          } catch {
+            console.error('Error fetching client data from URL invitation token');
+          }
           }
         }
         
@@ -186,7 +189,7 @@ const ClientProfile = () => {
       onSuccess: () => {
         // The hook will handle cache updates
       },
-      onError: (error) => {
+      onError: () => {
         // Error handling for notification toggle
       }
     });
@@ -211,7 +214,7 @@ const ClientProfile = () => {
         setShowUploadModal(false);
         setUploadedFile(null);
       },
-      onError: (error) => {
+      onError: () => {
         // Error toast is already handled in the hook
       }
     });
@@ -748,7 +751,7 @@ const ClientProfile = () => {
   );
 
   return (
-    <motion.div 
+    <MotionDiv 
       className="overflow-x-hidden"
       style={{
         backgroundImage: `url(${bg})`,
@@ -762,7 +765,7 @@ const ClientProfile = () => {
     >
       <main className="max-w-full mx-4 sm:mx-8 lg:mx-20 mt-8 md:mt-16 min-h-screen p-4 md:p-8">
         <div className="flex flex-col gap-8 w-full lg:w-[50%]">
-          <motion.header 
+          <MotionHeader 
             className="flex flex-col gap-1 sm:items-start items-center"
             variants={itemVariants}
           >
@@ -772,9 +775,9 @@ const ClientProfile = () => {
             <p className="font-normal text-sm md:text-md text-[#939799]">
               {tc('viewAndManageProfile')}
             </p>
-          </motion.header>
+          </MotionHeader>
 
-          <motion.div 
+          <MotionDiv 
             className="w-full bg-[#F8F8F8] border border-[#E8EDF3] rounded-lg overflow-hidden"
             variants={itemVariants}
           >
@@ -842,9 +845,9 @@ const ClientProfile = () => {
                 {tc('remove')}
               </Button>
             </div>
-          </motion.div>
+          </MotionDiv>
 
-          <motion.div 
+          <MotionDiv 
             className="flex flex-col gap-2 w-full md:w-[90%]"
             variants={itemVariants}
           >
@@ -872,10 +875,10 @@ const ClientProfile = () => {
                 }}
               />
             </div>
-          </motion.div>
+          </MotionDiv>
         </div>
 
-        <motion.div className='mt-8 md:mt-10' variants={itemVariants}>
+        <MotionDiv className='mt-8 md:mt-10' variants={itemVariants}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
             <h2 className="text-xl font-semibold">{tc('haircutGallery')}</h2>
             <div className="flex gap-2">
@@ -989,7 +992,7 @@ const ClientProfile = () => {
         </div>
       )}
     </div>
-        </motion.div>
+        </MotionDiv>
       </main>
 
 
@@ -1142,7 +1145,7 @@ const ClientProfile = () => {
           </div>
         )}
       />
-    </motion.div>
+    </MotionDiv>
   )
 }
 

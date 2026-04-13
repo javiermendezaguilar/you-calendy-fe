@@ -24,7 +24,7 @@ export const safeGetItem = (key, fallback = null) => {
     
     return item;
   } catch (error) {
-    console.warn(`Error getting localStorage item '${key}':`, error);
+    console.warn('Error getting localStorage item', { key, error });
     return fallback;
   }
 };
@@ -41,7 +41,7 @@ export const safeSetItem = (key, value) => {
     localStorage.setItem(key, stringValue);
     return true;
   } catch (error) {
-    console.warn(`Error setting localStorage item '${key}':`, error);
+    console.warn('Error setting localStorage item', { key, error });
     return false;
   }
 };
@@ -56,7 +56,7 @@ export const safeRemoveItem = (key) => {
     localStorage.removeItem(key);
     return true;
   } catch (error) {
-    console.warn(`Error removing localStorage item '${key}':`, error);
+    console.warn('Error removing localStorage item', { key, error });
     return false;
   }
 };
@@ -188,7 +188,7 @@ export const startDataMonitoring = () => {
     const validation = validateRequiredData(userType);
     
     if (!validation.isValid && validation.missing.length > 0) {
-      const restoration = restoreMissingData(userType);
+      restoreMissingData(userType);
     }
   };
   

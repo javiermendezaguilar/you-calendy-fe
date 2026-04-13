@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@mantine/core';
 import { toast } from 'sonner';
-import { BatchTranslationContext, useBatchTranslation } from '../../contexts/BatchTranslationContext';
+import { BatchTranslationContext } from '../../contexts/BatchTranslationContext';
 import { getBarberProfileByLink } from '../../services/businessPublicAPI';
 import BatchTranslationLoader from '../../components/barber/BatchTranslationLoader';
 import LanguageSelectionModal from '../../components/barber/LanguageSelectionModal';
@@ -12,9 +12,11 @@ import Gallery from './Gallery';
 import Header from './Header';
 import ClientProfile from './ClientProfile';
 import Footer from '../../components/home/landing/Footer';
-import SignInModal from './SignInModal';
-import SignUpModal from './SignUpModal';
-import ForgotPasswordModal from './ForgotPasswordModal';
+
+const SignInModal = lazy(() => import('./SignInModal'));
+const SignUpModal = lazy(() => import('./SignUpModal'));
+const ForgotPasswordModal = lazy(() => import('./ForgotPasswordModal'));
+const MotionDiv = motion.div;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,15 +38,12 @@ const PublicBarberProfile = () => {
   // Fallback tc function if context is not available
   const tc = context?.tc || ((key) => key);
   
-  const [barberData, setBarberData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
   const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
-  const [publicClientInfo, setPublicClientInfo] = useState(null);
-
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
@@ -81,7 +80,7 @@ const PublicBarberProfile = () => {
 
   // Modal handlers
   const handleSignInSuccess = (clientInfo) => {
-    setPublicClientInfo(clientInfo);
+    void clientInfo;
     setShowSignInModal(false);
     document.body.style.overflow = "auto";
     // Navigate to profile after successful sign in
@@ -89,7 +88,7 @@ const PublicBarberProfile = () => {
   };
 
   const handleSignUpSuccess = (clientInfo) => {
-    setPublicClientInfo(clientInfo);
+    void clientInfo;
     setShowSignUpModal(false);
     document.body.style.overflow = "auto";
     // Navigate to profile after successful sign up
@@ -144,8 +143,6 @@ const PublicBarberProfile = () => {
         const profileData = await getBarberProfileByLink(linkToken);
         
         if (profileData && profileData.business) {
-          setBarberData(profileData);
-          
           // Store business data in localStorage for the Home component to use
           localStorage.setItem('publicBusinessId', profileData.business._id);
           localStorage.setItem('publicBarberData', JSON.stringify(profileData));
@@ -246,7 +243,7 @@ const PublicBarberProfile = () => {
           overflowX: 'hidden'
         }}
       >
-        <motion.div 
+        <MotionDiv 
           className="w-full"
           variants={containerVariants}
           initial="hidden"
@@ -259,7 +256,7 @@ const PublicBarberProfile = () => {
         <div>
           <AnimatePresence mode="wait">
             {activeTab === "appointments" ? (
-              <motion.div
+              <MotionDiv
                 key="appointments"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -272,9 +269,9 @@ const PublicBarberProfile = () => {
                 <div className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[78%] mx-auto">
                   <Gallery />
                 </div>
-              </motion.div>
+              </MotionDiv>
             ) : (
-              <motion.div
+              <MotionDiv
                 key="profile"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -282,39 +279,51 @@ const PublicBarberProfile = () => {
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >
                 <ClientProfile />
-              </motion.div>
+              </MotionDiv>
             )}
           </AnimatePresence>
         </div>
         
         <Footer />
-        </motion.div>
+        </MotionDiv>
       </div>
       
       {/* Authentication Modals */}
-      <SignInModal
-        show={showSignInModal}
-        onClose={closeSignInModal}
-        onSignInSuccess={handleSignInSuccess}
-        onSwitchToSignUp={handleSwitchToSignUp}
-        onSwitchToForgotPassword={handleSwitchToForgotPassword}
-        service={null}
-      />
+      {showSignInModal ? (
+        <Suspense fallback={null}>
+          <SignInModal
+            show={showSignInModal}
+            onClose={closeSignInModal}
+            onSignInSuccess={handleSignInSuccess}
+            onSwitchToSignUp={handleSwitchToSignUp}
+            onSwitchToForgotPassword={handleSwitchToForgotPassword}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
       
-      <SignUpModal
-        show={showSignUpModal}
-        onClose={closeSignUpModal}
-        onSignUpSuccess={handleSignUpSuccess}
-        onSwitchToSignIn={handleSwitchToSignIn}
-        service={null}
-      />
+      {showSignUpModal ? (
+        <Suspense fallback={null}>
+          <SignUpModal
+            show={showSignUpModal}
+            onClose={closeSignUpModal}
+            onSignUpSuccess={handleSignUpSuccess}
+            onSwitchToSignIn={handleSwitchToSignIn}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
       
-      <ForgotPasswordModal
-        show={showForgotPasswordModal}
-        onClose={closeForgotPasswordModal}
-        onBackToSignIn={handleSwitchToSignIn}
-        service={null}
-      />
+      {showForgotPasswordModal ? (
+        <Suspense fallback={null}>
+          <ForgotPasswordModal
+            show={showForgotPasswordModal}
+            onClose={closeForgotPasswordModal}
+            onBackToSignIn={handleSwitchToSignIn}
+            service={null}
+          />
+        </Suspense>
+      ) : null}
     </BatchTranslationLoader>
   );
 };

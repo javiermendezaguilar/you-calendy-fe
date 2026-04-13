@@ -1,26 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { X, ChevronLeft, ChevronRight, Upload, Mail, Plus } from 'lucide-react';
-import { Calendar, USFlagIcon, GoogleIcon, FacebookIcon } from '../../components/common/Svgs';
-import { Button, TextInput, Checkbox, Textarea, Group, Box } from '@mantine/core';
+import { Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Button, Textarea } from '@mantine/core';
 import CommonModal from '../../components/common/CommonModal';
 import { UploadIcon } from '../../components/common/Svgs';
-import { signInWithGoogle, signInWithFacebook } from '../../configs/firebase.config';
 import { toast } from 'sonner';
 import { DatePicker } from '@mantine/dates';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { completeClientProfile, getClientByInvitationToken, clientLogin, clientAPI } from '../../services/clientAPI';
+import { getClientByInvitationToken, clientLogin, clientAPI } from '../../services/clientAPI';
 import { getBusinessById } from '../../services/businessPublicAPI';
 import { createClientAppointment } from '../../services/appointmentAPI';
 import { useGetAvailableSlots } from '../../hooks/useAppointments';
-import { getInvitationToken, clearInvitationToken, getCurrentBusinessId, getClientData, storeBusinessId } from '../../utils/invitationUtils';
+import { getInvitationToken, getCurrentBusinessId, getClientData, storeBusinessId } from '../../utils/invitationUtils';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 import { useGetActiveFlashSales, useGetActivePromotions } from '../../hooks/useMarketing';
 
 // Day names will be translated using tc() function in the component
 // daysOfWeekData removed as it's not used in the component
-
-const leftArrowImage = '/assets/left-arrow.svg'; 
-const rightArrowImage = '/assets/right-arrow.svg';
 
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
@@ -71,7 +65,7 @@ const formatDateObject = (date, normalizedPreference = '24h') => {
 
 // timeSlots will be replaced by dynamic availableSlots from API
 
-const PersonalizeView = ({ onBack, onSkip, onConfirm, service, day, time, total, duration, selectedDate, isBooking }) => {
+const PersonalizeView = ({ onSkip, onConfirm, isBooking }) => {
   const { tc } = useBatchTranslation();
   const [photos, setPhotos] = useState([]);
   const [instructions, setInstructions] = useState('');
@@ -373,7 +367,6 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
 
   const [staffInfo, setStaffInfo] = useState(null);
   const [clientData, setClientData] = useState(null);
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [businessName, setBusinessName] = useState('');
@@ -414,8 +407,8 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
   });
 
   // Fetch active flash sales and promotions for discount calculation
-  const { data: activeFlashSales = [], isLoading: flashSalesLoading, error: flashSalesError } = useGetActiveFlashSales(businessId);
-  const { data: activePromotions = [], isLoading: promotionsLoading, error: promotionsError } = useGetActivePromotions(businessId, selectedDate);
+  const { data: activeFlashSales = [] } = useGetActiveFlashSales(businessId);
+  const { data: activePromotions = [] } = useGetActivePromotions(businessId, selectedDate);
 
   useEffect(() => {
     const nameFromClient = clientData?.business?.businessName || clientData?.business?.name;
@@ -545,7 +538,7 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
   }, [selectedDate]);
 
   // Calculate discount based on flash sale or happy hour
-  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace('$', '')) : parseFloat(service.price)) : 15.00;
+  const originalPrice = service ? (typeof service.price === 'string' ? parseFloat(service.price.replace(/\$/g, '')) : parseFloat(service.price)) : 15.00;
   
   const discountInfo = useMemo(() => {
     // Early return if required data is missing
@@ -702,16 +695,14 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
       const client = response.data?.data || response.data;
       
       if (client) {
-        setIsProfileComplete(client.isProfileComplete || false);
-        
         // Extract and store staff information if available
         if (client.staff) {
           setStaffInfo(client.staff);
           localStorage.setItem('clientStaffId', client.staff._id);
         }
       }
-    } catch (error) {
-      console.error(tc('errorLoadingClientProfile'), error);
+    } catch {
+      console.error(tc('errorLoadingClientProfile'));
     } finally {
       setIsLoadingProfile(false);
     }
@@ -790,13 +781,11 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
         if (profileComplete && client._id) {
           try {
             await clientLogin(client._id);
-          } catch (loginError) {
-            console.error(tc('errorAuthenticatingClient'), loginError);
+          } catch {
+            console.error(tc('errorAuthenticatingClient'));
             // Continue without authentication, user can still browse
           }
         }
-        
-        setIsProfileComplete(profileComplete);
         return profileComplete;
       }
       
@@ -875,7 +864,7 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
       formData.append('clientNotes', selectedPastHaircut || '');
       
       // Append reference photos
-      photos.forEach((photo, index) => {
+      photos.forEach((photo) => {
         if (photo.file) {
           formData.append('referencePhotos', photo.file);
         }

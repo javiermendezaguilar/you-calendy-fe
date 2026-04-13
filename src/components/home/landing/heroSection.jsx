@@ -5,8 +5,12 @@ import HeroRibbon from "../../../assets/hero-ribbon.png";
 import HeroCandy from "../../../assets/hero-candy.png";
 import HeroBarbar from "../../../assets/hero-barber.webp";
 import { FaArrowRightLong } from "react-icons/fa6";
-import HeroBG from "../../../assets/HeroBG.png";
+import HeroBG from "../../../assets/hero-bg.webp";
 import { motion } from "framer-motion";
+
+const MotionDiv = motion.div;
+const MotionText = motion.p;
+const MotionImage = motion.img;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -39,25 +43,42 @@ const HeroSection = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <motion.div
+      <MotionDiv
         className="flex flex-col gap-3 md:gap-4"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <motion.p variants={itemVariants} className="text-2xl sm:text-3xl md:text-5xl flex gap-2 md:gap-4">
+        <MotionText
+          variants={itemVariants}
+          className="text-2xl sm:text-3xl md:text-5xl flex gap-2 md:gap-4"
+        >
           Grow Your{" "}
           <span>
-            <img src={HeroCandy} className="w-3 md:w-4" />
+            <img src={HeroCandy} alt="" className="w-3 md:w-4" decoding="async" />
           </span>
-        </motion.p>
-        <motion.p variants={itemVariants} className="text-3xl sm:text-4xl md:text-6xl font-semibold">Barber Business</motion.p>
-        <motion.img variants={itemVariants} src={HeroRibbon} className="w-full md:w-4/5" />
-        <motion.p variants={itemVariants} className="my-4 md:my-6 text-md">
+        </MotionText>
+        <MotionText
+          variants={itemVariants}
+          className="text-3xl sm:text-4xl md:text-6xl font-semibold"
+        >
+          Barber Business
+        </MotionText>
+        <MotionImage
+          variants={itemVariants}
+          src={HeroRibbon}
+          alt=""
+          className="w-full md:w-4/5"
+          decoding="async"
+        />
+        <MotionText variants={itemVariants} className="my-4 md:my-6 text-md">
           Simplify bookings, manage clients, track earnings, and attract more
-          customers—all in one powerful and easy-to-use app.
-        </motion.p>
-        <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3 md:gap-4">
+          customersâ€”all in one powerful and easy-to-use app.
+        </MotionText>
+        <MotionDiv
+          variants={itemVariants}
+          className="flex flex-wrap items-center gap-3 md:gap-4"
+        >
           <Link to="/registration">
             <Button
               size="md"
@@ -71,16 +92,23 @@ const HeroSection = () => {
           <Link to="/login" className="flex items-center gap-2">
             Learn More <FaArrowRightLong />
           </Link>
-        </motion.div>
-      </motion.div>
-      <motion.div
+        </MotionDiv>
+      </MotionDiv>
+      <MotionDiv
         className="hidden lg:flex justify-end items-center"
         variants={imageVariants}
         initial="hidden"
         animate="visible"
       >
-        <img src={HeroBarbar} className="w-5/6"/>
-      </motion.div>
+        <img
+          src={HeroBarbar}
+          alt="Barber using Groomnest"
+          className="w-5/6"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </MotionDiv>
     </div>
   );
 };

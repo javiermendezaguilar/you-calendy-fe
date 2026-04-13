@@ -35,8 +35,6 @@ const ProgressBar = () => (
 );
 
 const EmailLoginSection = ({ form, loading }) => {
-  const [error, setError] = useState("");
-
   return (
     <div className="flex flex-col gap-3 w-full">
       <TextInput
@@ -70,11 +68,6 @@ const EmailLoginSection = ({ form, loading }) => {
         }}
         {...form.getInputProps('password')}
       />
-      {error && (
-        <Text color="red" size="sm" mt={5}>
-          {error}
-        </Text>
-      )}
       <Button
         fullWidth
         size="md"
@@ -230,14 +223,11 @@ const Login = () => {
 
       const response = await login({...values, userType: 'user'});
 
-      if (response && response.data && response.data.user) {
+      if (response?.data?.user) {
         navigate("/dashboard");
       }
     } catch (error) {
       console.error("Login error:", error);
-      if (error?.message?.includes("Network Error")) {
-      } else {
-      }
     } finally {
       setLoadingStates(prev => ({ ...prev, email: false }));
     }

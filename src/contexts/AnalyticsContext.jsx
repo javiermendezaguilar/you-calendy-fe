@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import gaService from '../services/analytics';
 import gaConfigService from '../services/googleAnalyticsConfig';
+import { isAdminAuthenticated } from '../utils/authUtils';
 
 const AnalyticsContext = createContext();
 
@@ -15,6 +16,9 @@ export const useAnalytics = () => {
 export const AnalyticsProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [measurementId, setMeasurementId] = useState(null);
+
+  const isAdminRoute = window.location.pathname === '/admin' || window.location.pathname.startsWith('/admin/');
+  const canReadAdminAnalyticsConfig = isAdminRoute && isAdminAuthenticated();
 
   /**
    * Connect to Google Analytics
@@ -78,12 +82,9 @@ export const AnalyticsProvider = ({ children }) => {
    */
   useEffect(() => {
     const initializeAnalytics = async () => {
-      // Skip backend fetch for public barber/client routes - they don't have admin access
-      const isPublicRoute = window.location.pathname.startsWith('/barber/profile/') || 
-                           window.location.pathname.startsWith('/client/');
-      
-      // First try to get from backend - but only for admin routes
-      if (!isPublicRoute) {
+      // Backend configuration lives under an admin endpoint.
+      // Public routes must not hit it or they will create noisy auth/CORS failures.
+      if (canReadAdminAnalyticsConfig) {
         try {
           const backendConfig = await gaConfigService.getConfiguration();
           if (backendConfig.success && backendConfig.data?.googleAnalyticsApiKey) {
@@ -97,7 +98,7 @@ export const AnalyticsProvider = ({ children }) => {
               return;
             }
           }
-        } catch (error) {
+        } catch {
           // Silently handle - this is expected for non-admin users
         }
       }
@@ -116,7 +117,7 @@ export const AnalyticsProvider = ({ children }) => {
     };
 
     initializeAnalytics();
-  }, []);
+  }, [canReadAdminAnalyticsConfig]);
 
   /**
    * Track page views automatically on route changes

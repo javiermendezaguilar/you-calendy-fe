@@ -26,7 +26,7 @@ export const handleApiError = (error, context = 'API Call') => {
     errorInfo.type = 'network';
     errorInfo.shouldRetry = true;
     errorInfo.message = 'Network connection issue. Please check your internet connection.';
-    console.warn(`Network error in ${context}:`, error.message);
+    console.warn('Network error in API handler', { context, error: error.message });
     return errorInfo;
   }
 
@@ -49,7 +49,10 @@ export const handleApiError = (error, context = 'API Call') => {
       if (restoration.restored.length > 0) {
         errorInfo.shouldRetry = true;
         errorInfo.message = `Restored missing data: ${restoration.restored.join(', ')}. Please try again.`;
-        console.log('Restored missing auth data for retry:', restoration.restored);
+        console.log('Restored missing auth data for retry', {
+          context,
+          restored: restoration.restored,
+        });
       } else {
         errorInfo.shouldLogout = true;
         errorInfo.message = 'Authentication session has expired. Please log in again.';
@@ -67,7 +70,10 @@ export const handleApiError = (error, context = 'API Call') => {
   if (status === 403) {
     errorInfo.type = 'authorization';
     errorInfo.message = 'You do not have permission to perform this action.';
-    console.warn(`Authorization error in ${context}:`, error.response.data);
+    console.warn('Authorization error in API handler', {
+      context,
+      response: error.response.data,
+    });
     return errorInfo;
   }
 
@@ -105,12 +111,15 @@ export const handleApiError = (error, context = 'API Call') => {
     errorInfo.type = 'server';
     errorInfo.shouldRetry = true;
     errorInfo.message = 'Server error occurred. Please try again in a moment.';
-    console.error(`Server error in ${context}:`, error.response.data);
+    console.error('Server error in API handler', {
+      context,
+      response: error.response.data,
+    });
     return errorInfo;
   }
 
   // Unknown error
-  console.error(`Unknown error in ${context}:`, error);
+  console.error('Unknown API handler error', { context, error });
   return errorInfo;
 };
 
@@ -140,12 +149,20 @@ export const createRobustApiCall = (apiCall, options = {}) => {
         const validation = validateRequiredData(actualUserType);
         
         if (!validation.isValid) {
-          console.warn(`Attempt ${attempt + 1}: Missing required data:`, validation.missing);
+          console.warn('API call missing required data', {
+            attempt: attempt + 1,
+            context,
+            missing: validation.missing,
+          });
           
           const restoration = restoreMissingData(actualUserType);
           
           if (restoration.restored.length > 0) {
-            console.log(`Attempt ${attempt + 1}: Restored data:`, restoration.restored);
+            console.log('API call restored missing data', {
+              attempt: attempt + 1,
+              context,
+              restored: restoration.restored,
+            });
           } else if (attempt === 0) {
             // Only throw on first attempt if we can't restore data
             const error = new Error(`Missing required data: ${validation.missing.join(', ')}`);
@@ -159,7 +176,10 @@ export const createRobustApiCall = (apiCall, options = {}) => {
         
         // Success - reset any error state
         if (attempt > 0) {
-          console.log(`API call succeeded on attempt ${attempt + 1}`);
+          console.log('API call succeeded after retry', {
+            context,
+            attempt: attempt + 1,
+          });
         }
         
         return result;
@@ -170,7 +190,10 @@ export const createRobustApiCall = (apiCall, options = {}) => {
         
         // Handle logout if required
         if (errorInfo.shouldLogout) {
-          console.warn('API error requires logout:', errorInfo.message);
+          console.warn('API error requires logout', {
+            context,
+            message: errorInfo.message,
+          });
           authManager.handleInvalidSession();
           throw error;
         }
@@ -185,7 +208,12 @@ export const createRobustApiCall = (apiCall, options = {}) => {
         
         // Wait before retry
         if (attempt < maxRetries) {
-          console.log(`Retrying API call in ${retryDelay}ms (attempt ${attempt + 2}/${maxRetries + 1})`);
+          console.log('Retrying API call', {
+            context,
+            retryDelay,
+            nextAttempt: attempt + 2,
+            totalAttempts: maxRetries + 1,
+          });
           
           if (onRetry) {
             onRetry(error, errorInfo, attempt + 1);
@@ -217,10 +245,18 @@ export const createSafeApiCallWithErrorHandling = (apiCall, userType = null, con
     maxRetries: 2,
     retryDelay: 1000,
     onError: (error, errorInfo, attempt) => {
-      console.error(`${context} failed after ${attempt} attempts:`, errorInfo.message);
+      console.error('Robust API call failed after retries', {
+        context,
+        attempt,
+        message: errorInfo.message,
+      });
     },
     onRetry: (error, errorInfo, attempt) => {
-      console.log(`${context} retry ${attempt}:`, errorInfo.message);
+      console.log('Robust API call retry', {
+        context,
+        attempt,
+        message: errorInfo.message,
+      });
     }
   });
 };
@@ -234,7 +270,8 @@ export const handleGlobalApiError = (error, context = 'Global') => {
   const errorInfo = handleApiError(error, context);
   
   // Log the error
-  console.error(`Unhandled API error in ${context}:`, {
+  console.error('Unhandled API error', {
+    context,
     type: errorInfo.type,
     message: errorInfo.message,
     missingData: errorInfo.missingData,
@@ -271,7 +308,7 @@ export const setupGlobalErrorHandlers = () => {
       
       // Only handle API-related errors
       if (error && (error.response || error.request || error.config)) {
-        console.warn('Unhandled API promise rejection:', error);
+        console.warn('Unhandled API promise rejection', { error });
         handleGlobalApiError(error, 'Unhandled Promise');
         
         // Prevent the default browser behavior
@@ -285,7 +322,7 @@ export const setupGlobalErrorHandlers = () => {
       
       // Only handle API-related errors
       if (error && (error.response || error.request || error.config)) {
-        console.warn('Unhandled API error:', error);
+        console.warn('Unhandled API error event', { error });
         handleGlobalApiError(error, 'Global Error Handler');
       }
     });

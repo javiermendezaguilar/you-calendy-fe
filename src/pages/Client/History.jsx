@@ -4,7 +4,7 @@ import CommonModal from "../../components/common/CommonModal";
 import { ReplyIcon, UploadImageIcon } from "../../components/common/Svgs";
 import { AiOutlinePlus, AiOutlineEdit } from "react-icons/ai";
 import customer from "../../assets/customer.webp"
-import bg from "../../assets/bg.png"
+import bg from "../../assets/background.webp"
 import { useForm } from '@mantine/form';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 
@@ -23,6 +23,7 @@ const HistoryHeader = () => {
 };
 
 const NoteConversationView = ({ notes, onAddReply, onCancel, onSubmit }) => {
+  const { tc } = useBatchTranslation();
   const [reply, setReply] = useState("");
   const [showReplyForm, setShowReplyForm] = useState(false);
   
@@ -252,6 +253,7 @@ const ServiceCard = ({
   onAddNote,
   onEditNote,
 }) => {
+  const { tc } = useBatchTranslation();
   const fileInputRef = useRef(null);
   
   const handleUploadClick = () => {
@@ -262,7 +264,7 @@ const ServiceCard = ({
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = () => {
         // File loaded successfully
       };
       reader.readAsDataURL(file);
@@ -405,6 +407,7 @@ const serviceData = [
 ];
 
 const History = () => {
+  const { tc } = useBatchTranslation();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedServiceIndex, setSelectedServiceIndex] = useState(null);
   const [viewMode, setViewMode] = useState("add");
@@ -450,9 +453,6 @@ const History = () => {
     });
     
     setConversations(updatedConversations);
-    
-    const updatedServiceData = [...serviceData];
-    updatedServiceData[selectedServiceIndex].hasNote = true;
     
     setModalOpen(false);
   };
