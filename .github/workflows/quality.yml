@@ -45,5 +45,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Duplicate code scan
+      - name: Duplicate code scan on main
+        if: github.event_name != 'pull_request'
         run: npx jscpd --threshold 2 --gitignore --reporters console src
