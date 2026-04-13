@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { Button, TextInput, PasswordInput, Text, PinInput, Group } from "@mantine/core";
+import { Lock, ArrowLeft } from "lucide-react";
+import { Button, PasswordInput, Text, PinInput, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import LazyFooter from "../../components/home/landing/LazyFooter";
 import { HeaderLogo } from "../../components/common/Svgs";
 import { useResetPassword } from "../../hooks/useForgotPassword";
+import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
 
 const LogoSection = () => (
   <div className="w-full flex flex-col justify-start items-start">
@@ -36,6 +37,7 @@ const ResetPassword = () => {
   const email = searchParams.get('email') || '';
   const [resetCode, setResetCode] = useState('');
   const { mutateAsync: resetPassword, isLoading } = useResetPassword();
+  const { tc } = useBatchTranslation();
 
   const form = useForm({
     initialValues: {

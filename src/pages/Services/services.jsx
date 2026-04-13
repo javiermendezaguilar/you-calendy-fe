@@ -133,7 +133,6 @@ const Services = () => {
   };
 
   const formatPrice = (price, currency = 'USD') => `${getCurrencySymbol(currency)}${price.toFixed(2)}`;
-  const getServiceInitial = (name) => name.charAt(0);
 
   const inputStyles = {
     input: {
