@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Shield } from "lucide-react";
 import { Button, TextInput, PasswordInput, Text } from "@mantine/core";
-import { useForm, isNotEmpty, isEmail } from "@mantine/form";
-import Footer from "../../components/home/landing/Footer";
+import { useForm } from "@mantine/form";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 import { HeaderLogo } from "../../components/common/Svgs";
 import { useMutation } from "@tanstack/react-query";
 import custAxios from "../../configs/axios.config";
 import { toast } from "sonner";
 import { sanitizeAndStringifyUser } from "../../utils/userDataSanitizer";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 const LogoSection = () => (
@@ -104,10 +103,10 @@ const AdminLoginSection = ({ form, loading }) => {
 
 const AdminLogin = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   // Custom admin login mutation without automatic success toast
-  const { mutateAsync: login, isLoading } = useMutation({
+  const { mutateAsync: login } = useMutation({
     mutationFn: async (values) => {
       const res = await custAxios.post("/auth/login", values);
       return res.data;
@@ -145,7 +144,6 @@ const AdminLogin = () => {
       
       // Check if the logged in user has admin or sub-admin role
       const user = response?.data?.user;
-      const token = response?.data?.token;
       
       if (user && (user.role === "admin" || user.role === "sub-admin")) {
         // Note: adminToken is stored in httpOnly cookie automatically by backend
@@ -191,7 +189,7 @@ const AdminLogin = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

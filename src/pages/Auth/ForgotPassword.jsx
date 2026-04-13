@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import { Button, TextInput, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import Footer from "../../components/home/landing/Footer";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 import { HeaderLogo } from "../../components/common/Svgs";
 import { useForgotPassword } from "../../hooks/useForgotPassword";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
@@ -122,7 +122,7 @@ const ForgotPassword = () => {
             </div>
           </div>
         </main>
-        <Footer />
+        <LazyFooter />
       </div>
     );
   }
@@ -196,7 +196,7 @@ const ForgotPassword = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

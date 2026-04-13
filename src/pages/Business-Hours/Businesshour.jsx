@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ArrowLeft, ChevronRight, Plus, Trash2, ChevronDown, X, AlertCircle } from 'lucide-react';
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { Switch, Text, Button, Title, Modal, Group, ActionIcon, Stack, Select, TextInput } from '@mantine/core';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -450,7 +450,7 @@ const Businesshour = () => {
         </Modal>
       )}
 
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

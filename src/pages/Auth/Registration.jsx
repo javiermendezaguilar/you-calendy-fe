@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { TextInput, PasswordInput, Button, Text, Anchor, Checkbox } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { HeaderLogo } from "../../components/common/Svgs";
 import { setAuthDetails, nextStep, resetRegistration } from '../../store/registrationSlice';
 
@@ -210,7 +210,7 @@ const Registration = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

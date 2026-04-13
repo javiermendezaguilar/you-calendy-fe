@@ -11,7 +11,7 @@ import Home from './Home';
 import Gallery from './Gallery';
 import Header from './Header';
 import ClientProfile from './ClientProfile';
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 
 const SignInModal = lazy(() => import('./SignInModal'));
 const SignUpModal = lazy(() => import('./SignUpModal'));
@@ -284,7 +284,7 @@ const PublicBarberProfile = () => {
           </AnimatePresence>
         </div>
         
-        <Footer />
+        <LazyFooter />
         </MotionDiv>
       </div>
       

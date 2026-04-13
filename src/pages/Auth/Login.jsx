@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { Button, TextInput, PasswordInput, /* Divider, */ Text, Checkbox, Anchor } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import Footer from "../../components/home/landing/Footer";
+import LazyFooter from "../../components/home/landing/LazyFooter";
 // Social login icons temporarily disabled
 // import { GoogleIcon, FacebookIcon } from "../../components/common/Svgs";
 import { HeaderLogo } from "../../components/common/Svgs";
@@ -293,7 +293,7 @@ const Login = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

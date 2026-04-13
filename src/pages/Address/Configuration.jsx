@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { TextInput, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { HeaderLogo } from "../../components/common/Svgs";
 import CityAutocomplete from '../../components/common/CityAutocomplete';
 import { setAddress, nextStep, prevStep } from '../../store/registrationSlice';
@@ -204,7 +204,7 @@ const Configuration = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

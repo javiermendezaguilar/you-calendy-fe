@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Navigation, Search, CheckCircle, AlertCircle, MapPin as MapPinIcon } from 'lucide-react';
 import { Button, TextInput, Loader, Paper, Text, Transition } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { GoogleMap, useJsApiLoader, Marker, Autocomplete } from "@react-google-maps/api";
-import Footer from '../../components/home/landing/Footer';
+import LazyFooter from '../../components/home/landing/LazyFooter';
 import { HeaderLogo } from "../../components/common/Svgs";
 import { setLocation, nextStep, prevStep } from '../../store/registrationSlice';
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
@@ -399,7 +399,7 @@ const Location = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <LazyFooter />
     </div>
   );
 };

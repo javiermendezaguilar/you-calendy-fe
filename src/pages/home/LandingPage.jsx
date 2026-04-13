@@ -1,8 +1,8 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import HeroSection from "../../components/home/landing/heroSection";
-import Benefit from "../../components/home/landing/Benefit";
-import AdvantagesSection from "../../components/home/landing/Advantages/AdvantagesSection";
-const Footer = lazy(() => import("../../components/home/landing/Footer"));
+import LazyFooter from "../../components/home/landing/LazyFooter";
+const Benefit = lazy(() => import("../../components/home/landing/Benefit"));
+const AdvantagesSection = lazy(() => import("../../components/home/landing/Advantages/AdvantagesSection"));
 const Booking = lazy(() => import("../../components/home/landing/Booking"));
 const AppointmentHistorySection = lazy(() => import("../../components/home/landing/BenefitSection/AppointmentHistorySection"));
 const BenefitSection = lazy(() => import("../../components/home/landing/BenefitSection/BenefitSection"));
@@ -111,12 +111,16 @@ const LandingPage = () => {
       className="overflow-x-hidden"
     >
       <HeroSection />
-      <div id="features">
-        <Benefit />
-      </div>
-      <div id="advantages">
-        <AdvantagesSection />
-      </div>
+      <DeferredSection minHeight={720} rootMargin="150px 0px">
+        <div id="features">
+          <Benefit />
+        </div>
+      </DeferredSection>
+      <DeferredSection minHeight={560} rootMargin="150px 0px">
+        <div id="advantages">
+          <AdvantagesSection />
+        </div>
+      </DeferredSection>
       <DeferredSection minHeight={900}>
         <main className="flex flex-col items-center w-full min-h-screen bg-white mt-20 p-10 max-md:p-[30px] max-sm:p-5">
           <div className="flex items-center w-[90%] max-md:w-full max-md:flex-col">
@@ -144,7 +148,7 @@ const LandingPage = () => {
         <Booking />
       </DeferredSection>
       <DeferredSection minHeight={240}>
-        <Footer />
+        <LazyFooter />
       </DeferredSection>
       {tooltip.visible && (
         <div
