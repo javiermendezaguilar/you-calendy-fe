@@ -84,7 +84,7 @@ const AdminDashboard = () => {
       const exportData = prepareDashboardData(userStats, revenueData, trendsData);
       await exportToCSV(exportData);
       toast.success(tc('csvExportedSuccessfully') || 'CSV exported successfully!');
-    } catch (error) {
+    } catch {
       toast.error(tc('csvExportFailed') || 'Failed to export CSV file');
     } finally {
       setIsExporting(false);
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
       const exportData = prepareDashboardData(userStats, revenueData, trendsData);
       await exportToPDF(exportData);
       toast.success(tc('pdfExportedSuccessfully') || 'PDF exported successfully!');
-    } catch (error) {
+    } catch {
       toast.error(tc('pdfExportFailed') || 'Failed to export PDF file');
     } finally {
       setIsExporting(false);

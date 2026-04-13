@@ -13,9 +13,6 @@ import { clientAPI, clientLogin } from '../../services/clientAPI';
 // Day names will be translated using tc() function in the component
 // daysOfWeekData removed as it's not used in the component
 
-const leftArrowImage = '/assets/left-arrow.svg'; 
-const rightArrowImage = '/assets/right-arrow.svg';
-
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
   if (normalized.startsWith('24') || normalized.includes('military')) {
@@ -65,7 +62,7 @@ const formatDateObject = (date, normalizedPreference = '24h') => {
 
 // timeSlots will be replaced by dynamic availableSlots from API
 
-const PersonalizeView = ({ onBack, onSkip, onConfirm, service, day, time, total, duration, selectedDate, isBooking }) => {
+const PersonalizeView = ({ onSkip, onConfirm, isBooking }) => {
   const { tc } = useBatchTranslation();
   const [photos, setPhotos] = useState([]);
   const [instructions, setInstructions] = useState('');
@@ -353,7 +350,6 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
   });
 
   const [staffInfo, setStaffInfo] = useState(null);
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
 
@@ -619,15 +615,13 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       const client = response.data?.data || response.data;
       
       if (client) {
-        setIsProfileComplete(client.isProfileComplete || false);
-        
         // Extract and store staff information if available
         if (client.staff) {
           setStaffInfo(client.staff);
           localStorage.setItem('clientStaffId', client.staff._id);
         }
       }
-    } catch (error) {
+    } catch {
       // Silently handle error
     } finally {
       setIsLoadingProfile(false);
@@ -727,7 +721,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                 // Ensure client is logged in to get the cookie (if not already set by complete-profile)
                 try {
                   await clientLogin(clientId);
-                } catch (loginError) {
+                } catch {
                   // Continue anyway - cookie might already be set from complete-profile
                 }
               } else {
@@ -735,7 +729,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                 // This is a fallback that creates client data as part of appointment creation
                 clientId = `temp_${Date.now()}_${pendingClientData.email}`;
               }
-            } catch (clientError) {
+            } catch {
               // Use temporary ID for now, appointment creation might handle client creation
               clientId = `temp_${Date.now()}_${pendingClientData.email}`;
             }
@@ -772,7 +766,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       formData.append('clientNotes', selectedPastHaircut || '');
       
       // Append reference photos
-      photos.forEach((photo, index) => {
+      photos.forEach((photo) => {
         if (photo.file) {
           formData.append('referencePhotos', photo.file);
         }
@@ -786,7 +780,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
         if (clientId) {
           try {
             await clientLogin(clientId);
-          } catch (loginError) {
+          } catch {
             // Continue anyway - cookie might already be set
           }
         }
@@ -834,7 +828,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
               // If check fails, assume first appointment for safety
               isFirstAppointment = true;
             }
-          } catch (error) {
+          } catch {
             // If check fails, assume it might be first appointment (safer to show message)
             isFirstAppointment = true;
           }
@@ -924,7 +918,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
                   }
                 }
               }
-            } catch (error) {
+            } catch {
               // If verification fails but we thought it was first, show message anyway
               if (isFirstAppointment) {
                 const registrationMessage = tc('registeredAsClientCanAccessProfile') || 
@@ -951,7 +945,7 @@ const ReservationModal = ({ show, onClose, service, publicClientInfo, selectedSt
       
       // This should not happen in barber profile flow
       toast.error(tc('invalidBookingFlow'));
-    } catch (error) {
+    } catch {
       toast.error(tc('errorOccurredBookingAppointment'));
     } finally {
       setIsBooking(false);

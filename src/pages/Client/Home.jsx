@@ -1,7 +1,6 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, Search, ArrowLeft, ArrowRight } from 'lucide-react';
 import barber from "../../assets/barber.webp"
-import customer from "../../assets/customer.webp"
 import { FooterInstagramIcon, FooterFacebookIcon, FooterTwitterIcon, ShareIcon } from '../../components/common/Svgs';
 import Checky from "../../assets/checky.png"
 import { SendIcon } from '../../components/common/Svgs';
@@ -10,7 +9,7 @@ import { Carousel } from '@mantine/carousel';
 import '@mantine/carousel/styles.css';
 import background from "../../assets/background.webp"
 import { motion, AnimatePresence } from 'framer-motion';
-import { getBusinessById, getBusinessServices, getBusinessHours, getBusinessStaff, getBusinessGallery, getClientByInvitationToken, getStaffWorkingHoursClientSide } from '../../services/businessPublicAPI';
+import { getBusinessById, getBusinessServices, getBusinessHours, getBusinessStaff, getClientByInvitationToken, getStaffWorkingHoursClientSide } from '../../services/businessPublicAPI';
 import { getCurrentBusinessId, getInvitationToken, processInvitationFromUrl, storeStaffId, storeClientData, getCurrentStaffId, getClientData } from '../../utils/invitationUtils';
 import { toast } from 'sonner';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
@@ -58,6 +57,8 @@ const dropdownVariants = {
     transition: { duration: 0.3, ease: "easeInOut" } 
   }
 };
+
+const MotionDiv = motion.div;
 
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
@@ -137,13 +138,6 @@ const convertDurationObjectToMinutes = (duration) => {
 
 export const Home = () => {
   const { tc } = useBatchTranslation();
-  
-  const footerLinks = {
-    company: [tc('aboutUs'), tc('howItWorks'), tc('careers'), tc('contact')],
-    explore: [tc('services'), tc('pricing'), tc('testimonials')],
-    support: [tc('helpCenter'), tc('faqs'), tc('privacyPolicy')],
-    resources: [tc('blog'), tc('community'), tc('newsUpdates')],
-  };
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -160,9 +154,9 @@ export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   // Client and Staff Data State
-  const [clientData, setClientData] = useState(null);
+  const [, setClientData] = useState(null);
   const [assignedStaff, setAssignedStaff] = useState(null);
-  const [allServices, setAllServices] = useState([]);
+  const [, setAllServices] = useState([]);
   const preferredTimeFormat = normalizeTimeFormatPreference(businessData?.timeFormatPreference);
   const serviceDurationLookup = useMemo(() => {
     if (assignedStaff) {
@@ -579,7 +573,7 @@ export const Home = () => {
   }
 
   return (
-    <motion.div 
+    <MotionDiv 
       className="bg-transparent flex flex-row justify-center w-full" 
       style={{ 
         backgroundImage: `url(${background})`,
@@ -597,7 +591,7 @@ export const Home = () => {
           
           <div className="px-3 md:px-6 lg:px-8 xl:px-12 relative">
             
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[60%] xl:w-[55%] h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] mt-[100px] rounded-[16px] overflow-hidden relative float-none lg:float-left"
               variants={leftSlideVariant}
             >
@@ -662,9 +656,9 @@ export const Home = () => {
                   </div>
                 </div>
               )}
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[38%] xl:w-[40%] float-none lg:float-right mt-6 lg:mt-[100px]"
               variants={rightSlideVariant}
             >
@@ -909,9 +903,9 @@ export const Home = () => {
               
               </div>
               
-            </motion.div>         
+            </MotionDiv>         
 
-            <motion.div 
+            <MotionDiv 
               className="flex flex-col w-full lg:w-[56%] items-start gap-[4px] clear-both lg:clear-none pt-6 lg:pt-0"
               variants={fadeInUpVariant}
             >
@@ -936,9 +930,9 @@ export const Home = () => {
                   }
                 </p>
               </div>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="w-full sm:w-[280px] md:w-[300px] lg:w-[320px] mt-4 sm:mt-6 h-[36px] sm:h-[40px] bg-[#1b1d21] rounded-[40px] flex items-center px-2 sm:px-3 py-1.5 sm:py-2"
               variants={fadeInUpVariant}
             >
@@ -953,9 +947,9 @@ export const Home = () => {
                   YOU CALENDY
                 </span>
               </span>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="flex flex-col w-full lg:w-[55%] items-start mt-6 sm:mt-8"
               variants={fadeInUpVariant}
             >
@@ -977,11 +971,11 @@ export const Home = () => {
                   />
                 </div>
               </div>
-            </motion.div>
+            </MotionDiv>
 
             <div className="w-full lg:w-[55%] h-px mt-4 bg-gray-200" />
 
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[55%] mt-4 mb-6 sm:mb-8"
               variants={fadeInUpVariant}
             >
@@ -996,7 +990,7 @@ export const Home = () => {
               
               <AnimatePresence>
                 {isAccordionOpen && (
-                  <motion.div 
+                  <MotionDiv 
                     className="w-full mt-4 overflow-hidden"
                     initial="hidden"
                     animate="visible"
@@ -1070,10 +1064,10 @@ export const Home = () => {
                         </p>
                       </div>
                     )}
-                  </motion.div>
+                  </MotionDiv>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </MotionDiv>
           </div>
         </div>
       </div>
@@ -1090,7 +1084,7 @@ export const Home = () => {
         </Suspense>
       ) : null}
       
-    </motion.div>
+    </MotionDiv>
   );
 };
 

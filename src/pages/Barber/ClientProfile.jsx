@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Button, Switch, Textarea, Skeleton, Popover, ActionIcon } from '@mantine/core'
+import { Button, Textarea, Skeleton, Popover, ActionIcon } from '@mantine/core'
 import CommonModal from '../../components/common/CommonModal'
 import { UploadImageIcon, UploadPhotoIcon, UploadSvgIcon, StartIcon } from '../../components/common/Svgs'
 import { motion } from 'framer-motion'
@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { User, Info, Trash2 } from 'lucide-react'
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext'
 import { useQueryClient } from '@tanstack/react-query'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   useClientProfile,
   useClientGallery,
@@ -15,7 +15,6 @@ import {
   useAddSuggestion,
   useReportImage,
   useNotificationPreferences,
-  useToggleNotifications,
   useDeleteClientProfile,
   useDeleteClientGalleryImage,
   useUpdateClientProfile
@@ -40,10 +39,12 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
 };
 
+const MotionDiv = motion.div;
+const MotionHeader = motion.header;
+
 const ClientProfile = () => {
   const { tc } = useBatchTranslation();
   const queryClient = useQueryClient();
-  const location = useLocation();
   const { linkToken } = useParams();
   // State for client authentication
   const [clientId, setClientId] = useState(null);
@@ -70,7 +71,7 @@ const ClientProfile = () => {
             try {
               const barberData = JSON.parse(publicBarberData);
               storedBusinessId = barberData?.business?._id || barberData?.businessId;
-            } catch (e) {
+            } catch {
               // Silently handle parse error
             }
           }
@@ -103,13 +104,13 @@ const ClientProfile = () => {
             } else {
               setIsInitialized(true); // Still initialize to show error state
             }
-          } catch (error) {
+          } catch {
             setIsInitialized(true); // Still initialize to show error state
           }
         } else {
           setIsInitialized(true); // Still initialize to show error state
         }
-      } catch (error) {
+      } catch {
         setIsInitialized(true); // Still initialize to show error state
       }
     };
@@ -141,7 +142,7 @@ const ClientProfile = () => {
   // API hooks - only initialize after clientId is available and component is initialized
   const { data: clientProfile, isLoading: profileLoading, error: profileError } = useClientProfile(isInitialized ? clientId : null);
   const { data: galleryData, isLoading: galleryLoading } = useClientGallery(isInitialized ? clientId : null);
-  const { data: notificationPrefs, isLoading: notificationLoading } = useNotificationPreferences(isInitialized ? clientId : null);
+  useNotificationPreferences(isInitialized ? clientId : null);
   
   // Check if client is logged in
   const isLoggedIn = !!(clientId && businessId);
@@ -151,7 +152,6 @@ const ClientProfile = () => {
   const uploadImageMutation = useUploadHaircutImage(clientId);
   const addSuggestionMutation = useAddSuggestion();
   const reportImageMutation = useReportImage();
-  const toggleNotificationsMutation = useToggleNotifications();
   const deleteProfileMutation = useDeleteClientProfile();
   const deleteGalleryImageMutation = useDeleteClientGalleryImage(clientId);
   const updateProfileMutation = useUpdateClientProfile(clientId);
@@ -262,18 +262,6 @@ const ClientProfile = () => {
     });
   };
 
-  const handleNotificationToggle = () => {
-    const newState = !notificationPrefs?.enabled;
-    toggleNotificationsMutation.mutate(newState, {
-      onSuccess: () => {
-        // The hook will handle cache updates
-      },
-      onError: (error) => {
-        // Error handling for notification toggle
-      }
-    });
-  };
-
   const handleUploadPhoto = () => {
     setShowUploadModal(true);
   };
@@ -293,7 +281,7 @@ const ClientProfile = () => {
         setShowUploadModal(false);
         setUploadedFile(null);
       },
-      onError: (error) => {
+      onError: () => {
         // Error toast is already handled in the hook
       }
     });
@@ -884,7 +872,7 @@ const ClientProfile = () => {
   );
 
   return (
-    <motion.div 
+    <MotionDiv 
       className="overflow-x-hidden"
       style={{
         backgroundImage: `url(${bg})`,
@@ -898,7 +886,7 @@ const ClientProfile = () => {
     >
       <main className="max-w-full mx-4 sm:mx-8 lg:mx-20 mt-8 md:mt-16 min-h-screen p-4 md:p-8">
         <div className="flex flex-col gap-8 w-full lg:w-[50%]">
-          <motion.header 
+          <MotionHeader 
             className="flex flex-col gap-1 sm:items-start items-center"
             variants={itemVariants}
           >
@@ -956,9 +944,9 @@ const ClientProfile = () => {
             <p className="font-normal text-sm md:text-md text-[#939799]">
               {tc('viewAndManageProfile')}
             </p>
-          </motion.header>
+          </MotionHeader>
 
-          <motion.div 
+          <MotionDiv 
             className="w-full bg-[#F8F8F8] border border-[#E8EDF3] rounded-lg overflow-hidden mb-0"
             variants={itemVariants}
           >
@@ -1058,10 +1046,10 @@ const ClientProfile = () => {
                 onChange={handleProfileImageChange}
               />
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Remove Account Section */}
-          <motion.div 
+          <MotionDiv 
             className="w-full -mt-5"
             variants={itemVariants}
           >
@@ -1075,13 +1063,13 @@ const ClientProfile = () => {
                 {tc('removeAccount')}
               </button>
             </p>
-          </motion.div>
+          </MotionDiv>
 
         </div>
 
         {/* Haircut Gallery - Only show when logged in */}
         {isLoggedIn && (
-          <motion.div className='mt-8 md:mt-10' variants={itemVariants}>
+          <MotionDiv className='mt-8 md:mt-10' variants={itemVariants}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
             <h2 className="text-xl font-semibold">{tc('haircutGallery')}</h2>
             <div className="flex gap-2">
@@ -1183,7 +1171,7 @@ const ClientProfile = () => {
                 </div>
               )}
             </div>
-        </motion.div>
+        </MotionDiv>
         )}
       </main>
 
@@ -1365,7 +1353,7 @@ const ClientProfile = () => {
           }
         }}
       />
-    </motion.div>
+    </MotionDiv>
   )
 }
 

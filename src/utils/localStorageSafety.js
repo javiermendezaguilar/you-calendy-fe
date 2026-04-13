@@ -188,7 +188,7 @@ export const startDataMonitoring = () => {
     const validation = validateRequiredData(userType);
     
     if (!validation.isValid && validation.missing.length > 0) {
-      const restoration = restoreMissingData(userType);
+      restoreMissingData(userType);
     }
   };
   

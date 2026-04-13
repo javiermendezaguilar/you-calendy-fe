@@ -6,14 +6,12 @@ import { BatchTranslationContext } from "../../contexts/BatchTranslationContext"
 import BatchLanguageSelector from "../../components/barber/BatchLanguageSelector";
 import { useClientProfile } from "../../hooks/useClientProfile";
 import { Skeleton } from "@mantine/core";
-import { toast } from "sonner";
 import { clientLogin } from "../../services/clientAPI";
 
 const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [businessLogo, setBusinessLogo] = useState(null);
-  const [activeTab, setActiveTab] = useState("appointments");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   
@@ -43,11 +41,7 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
   };
 
   useEffect(() => {
-    if (isProfilePage) {
-      setActiveTab("profile");
-    } else {
-      setActiveTab("appointments");
-    }
+    // Active state is driven by the parent via externalActiveTab.
   }, [isProfilePage]);
 
   useEffect(() => {
@@ -60,15 +54,15 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
         if (logo) {
           setBusinessLogo(logo);
         }
-      } catch (error) {
+      } catch {
         // Silently handle parse error
       }
     }
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = ({ target }) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setShowDropdown(false);
       }
     };
@@ -81,7 +75,7 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
 
   // Listen for appointment booking events to refresh profile state
   useEffect(() => {
-    const handleAppointmentBooked = (event) => {
+    const handleAppointmentBooked = () => {
       // When an appointment is booked, the profile should now be accessible
       // The profile check will work on next click since appointments now exist
     };
@@ -106,8 +100,6 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
   };
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    
     if (onTabChange) {
       onTabChange(tab);
     }
@@ -126,7 +118,7 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
       // Try to login first to get cookie
       try {
         await clientLogin(clientId);
-      } catch (loginError) {
+      } catch {
         // Continue anyway - might already be logged in
       }
 
@@ -149,7 +141,7 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
                              (Array.isArray(result?.data) && result.data.length > 0);
       
       return hasAppointments;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -223,7 +215,7 @@ const Header = ({ onTabChange, activeTab: externalActiveTab }) => {
       
       // Reload the page to reset the state
       window.location.reload();
-    } catch (error) {
+    } catch {
       // Silently handle error and still reload
       window.location.reload();
     }

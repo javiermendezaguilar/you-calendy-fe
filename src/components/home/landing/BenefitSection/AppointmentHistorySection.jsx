@@ -14,6 +14,8 @@ import profileImage from "../../../../assets/customer.webp";
 import haircutPlaceholder from "../../../../assets/haircut.webp";
 import { motion } from "framer-motion";
 
+const MotionDiv = motion.div;
+
 const appointmentsData = [
   {
     id: "001",
@@ -182,7 +184,7 @@ const AppointmentHistorySection = () => {
   ));
 
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, x: -50 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, amount: 0.3 }}
@@ -250,7 +252,7 @@ const AppointmentHistorySection = () => {
       </Paper>
       <ClientNotes client={selectedClient} />
     </Box>
-    </motion.div>
+    </MotionDiv>
   );
 };
 

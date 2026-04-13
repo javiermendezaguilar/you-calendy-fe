@@ -98,7 +98,7 @@ export const AnalyticsProvider = ({ children }) => {
               return;
             }
           }
-        } catch (error) {
+        } catch {
           // Silently handle - this is expected for non-admin users
         }
       }

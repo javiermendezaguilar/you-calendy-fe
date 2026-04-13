@@ -38,7 +38,7 @@ export const useStartFreeTrial = () => {
       const response = await businessAPI.startFreeTrial();
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success(tc("freeTrialStartedSuccessfully"));
   // Invalidate subscription status to refetch
   queryClient.invalidateQueries({ queryKey: ["subscriptionStatus"] });
@@ -56,7 +56,7 @@ export const useCreateSubscription = () => {
   const { tc } = useBatchTranslation();
   
   return useMutation({
-    mutationFn: async ({ priceId, skipToast = false }) => {
+    mutationFn: async ({ priceId }) => {
       try {
         const response = await businessAPI.createStripeSubscription({ priceId });
         return response.data;
@@ -64,25 +64,16 @@ export const useCreateSubscription = () => {
         const status = err?.response?.status;
         const message = err?.response?.data?.message || "";
 
-        // If backend requires starting the trial first, do so and then retry subscription
         if (
           status === 400 &&
           typeof message === "string" &&
           message.toLowerCase().includes("start your free trial first")
         ) {
-          // Attempt to start the free trial
-          try {
-            await businessAPI.startFreeTrial();
-          } catch (startErr) {
-            // If starting the trial fails (e.g., setup incomplete), bubble up that error
-            throw startErr;
-          }
-          // Retry creating the subscription after starting the trial
+          await businessAPI.startFreeTrial();
           const retryResponse = await businessAPI.createStripeSubscription({ priceId });
           return retryResponse.data;
         }
 
-        // For all other errors, bubble up
         throw err;
       }
     },

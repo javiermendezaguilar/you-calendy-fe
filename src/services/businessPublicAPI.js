@@ -175,15 +175,10 @@ export const getStaffWorkingHoursClientSide = async (staffId) => {
  * @param {string} businessId - Business ID
  * @returns {Promise<Array>} Business staff (empty for public access)
  */
-export const getBusinessStaff = async (businessId) => {
-  try {
-    // Staff endpoints require authentication, so for public client access we return empty array
-    // In a real implementation, you might want to have a public staff endpoint that returns basic info
-    return [];
-  } catch (error) {
-    console.error('Error fetching business staff:', error);
-    throw error;
-  }
+export const getBusinessStaff = async () => {
+  // Staff endpoints require authentication, so for public client access we return empty array
+  // In a real implementation, you might want to have a public staff endpoint that returns basic info
+  return [];
 };
 
 /**
@@ -220,6 +215,7 @@ export const getClientByInvitationToken = async (invitationToken) => {
  */
 export const getStaffServices = async (businessId, staffId) => {
   try {
+    void staffId;
     // Get all business services
     const allServices = await getBusinessServices(businessId);
     

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import batchTranslationService from '../services/batchTranslationService';
@@ -2086,12 +2086,12 @@ export const BatchTranslationContext = createContext();
 export const BatchTranslationProvider = ({ children }) => {
   const { t } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
-  const [commonTexts, setCommonTexts] = useState({});
+  const [commonTexts] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
   const [autoExtractionEnabled, setAutoExtractionEnabled] = useState(true);
   const [extractedTexts, setExtractedTexts] = useState([]);
-  const [translationsUpdated, setTranslationsUpdated] = useState(0);
+  const [, setTranslationsUpdated] = useState(0);
 
   // Initialize context detection service
   useEffect(() => {
@@ -2149,7 +2149,9 @@ export const BatchTranslationProvider = ({ children }) => {
             });
           }
         }
-      } catch { }
+      } catch {
+        // Ignore cache hydration failures and continue with live hydration.
+      }
       batchTranslationService.ensureTranslationsForCurrentLanguage();
     }, 800);
     return () => clearTimeout(timeoutId);
@@ -2257,7 +2259,9 @@ export const BatchTranslationProvider = ({ children }) => {
     // Save to localStorage immediately
     try {
       localStorage.setItem('youCalendy_selectedLanguage', newLanguage);
-    } catch { }
+    } catch {
+      // Ignore storage write failures; language already changed in memory.
+    }
 
     // Update i18next synchronously (texts are local, should be instant)
     // Use void to explicitly ignore the promise

@@ -30,28 +30,6 @@ const apis = [api, formApi];
 apis.forEach((instance) => {
   instance.interceptors.request.use(
     (config) => {
-      // List of public endpoints that don't require authentication
-      const publicEndpoints = [
-        '/client/invitation/',
-        '/appointments/available',
-        '/business/public/',
-        '/business/gallery/',
-        '/business/hours/'
-        // Note: /credits/products is public for customers, but admin operations need auth
-        // /admin/credits/products requires authentication
-      ];
-      
-      // Add specific check for credits endpoint - only public for GET requests to /credits/products
-      const isPublicCreditsEndpoint = config.url === '/credits/products' && config.method?.toLowerCase() === 'get';
-      
-      // Add specific check for business services - only GET requests are public
-      const isPublicBusinessServicesEndpoint = config.url && config.url.includes('/business/services/') && config.method?.toLowerCase() === 'get';
-      
-      // Check if the request URL matches any public endpoint
-      const isPublicEndpoint = publicEndpoints.some(endpoint => 
-        config.url && config.url.includes(endpoint)
-      ) || isPublicCreditsEndpoint || isPublicBusinessServicesEndpoint;
-      
       // Authentication is handled automatically via httpOnly cookies (withCredentials: true)
       // No need to manually add Authorization headers - cookies are sent automatically
 
@@ -61,7 +39,7 @@ apis.forEach((instance) => {
         if (userContext) {
           config.headers['x-user-context'] = userContext;
         }
-      } catch (e) {
+      } catch {
         // Ignore context detection errors
       }
       

@@ -280,7 +280,7 @@ class AuthManager {
       // Only log warning, don't treat as critical error
       // User data might be loading or cookies might handle authentication
       
-      const restoration = restoreMissingData(userContext);
+      restoreMissingData(userContext);
       
       // Don't log error - missing user data is not critical since cookies handle auth
     }

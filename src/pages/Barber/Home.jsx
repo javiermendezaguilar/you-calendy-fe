@@ -1,7 +1,6 @@
 import React, { lazy, Suspense, useState, useEffect, useMemo, useCallback } from 'react';
 import { ChevronDown, Search, ArrowLeft, ArrowRight } from 'lucide-react';
 import barber from "../../assets/barber.webp"
-import customer from "../../assets/customer.webp"
 import { FooterInstagramIcon, FooterFacebookIcon, FooterTwitterIcon, ShareIcon } from '../../components/common/Svgs';
 import Checky from "../../assets/checky.png"
 import { SendIcon } from '../../components/common/Svgs';
@@ -10,7 +9,7 @@ import { Carousel } from '@mantine/carousel';
 import '@mantine/carousel/styles.css';
 import background from "../../assets/background.webp"
 import { motion, AnimatePresence } from 'framer-motion';
-import { getBarberProfileByLink, getStaffWorkingHoursClientSide } from '../../services/businessPublicAPI';
+import { getStaffWorkingHoursClientSide } from '../../services/businessPublicAPI';
 import { toast } from 'sonner';
 import { useBatchTranslation } from '../../contexts/BatchTranslationContext';
 
@@ -62,6 +61,8 @@ const dropdownVariants = {
   }
 };
 
+const MotionDiv = motion.div;
+
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
   if (normalized.startsWith('24') || normalized.includes('military')) {
@@ -84,69 +85,8 @@ const toServiceIdentifier = (serviceLike) => {
   return undefined;
 };
 
-const parseMinutes = (value) => {
-  if (value === undefined || value === null) return undefined;
-  const numeric = Number(value);
-  if (Number.isFinite(numeric) && numeric > 0) {
-    return Math.round(numeric);
-  }
-  if (typeof value === 'string') {
-    const parsed = Number.parseInt(value, 10);
-    if (!Number.isNaN(parsed) && parsed > 0) {
-      return parsed;
-    }
-  }
-  return undefined;
-};
-
-const buildServiceDurationLookup = (staffMembers = []) => {
-  const lookup = new Map();
-  staffMembers.forEach((staffMember) => {
-    const services = staffMember?.services;
-    if (!Array.isArray(services)) return;
-    services.forEach((entry) => {
-      const serviceId = toServiceIdentifier(entry?.service ?? entry);
-      if (!serviceId) return;
-      const minutes = parseMinutes(entry?.timeInterval ?? entry?.duration ?? entry?.minutes);
-      if (minutes) {
-        lookup.set(String(serviceId), minutes);
-      }
-    });
-  });
-  return lookup;
-};
-
-const formatMinutesLabel = (minutes) => {
-  if (!minutes || !Number.isFinite(minutes) || minutes <= 0) {
-    return undefined;
-  }
-  const wholeMinutes = Math.round(minutes);
-  const hours = Math.floor(wholeMinutes / 60);
-  const remaining = wholeMinutes % 60;
-  const parts = [];
-  if (hours > 0) parts.push(`${hours} hr`);
-  if (remaining > 0) parts.push(`${remaining} min`);
-  if (parts.length === 0) parts.push('1 min');
-  return parts.join(' ').trim();
-};
-
-const convertDurationObjectToMinutes = (duration) => {
-  if (!duration || typeof duration !== 'object') return undefined;
-  const hours = parseMinutes(duration.hours);
-  const minutes = parseMinutes(duration.minutes);
-  const total = (hours ? hours * 60 : 0) + (minutes || 0);
-  return total > 0 ? total : undefined;
-};
-
 export const Home = () => {
   const { tc } = useBatchTranslation();
-  
-  const footerLinks = {
-    company: [tc('aboutUs'), tc('howItWorks'), tc('careers'), tc('contact')],
-    explore: [tc('services'), tc('pricing'), tc('testimonials')],
-    support: [tc('helpCenter'), tc('faqs'), tc('privacyPolicy')],
-    resources: [tc('blog'), tc('community'), tc('newsUpdates')],
-  };
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showSignInModal, setShowSignInModal] = useState(false);
@@ -169,15 +109,7 @@ export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   
   // Barber Profile Data State
-  const [allServices, setAllServices] = useState([]);
   const preferredTimeFormat = normalizeTimeFormatPreference(businessData?.timeFormatPreference);
-  const serviceDurationLookup = useMemo(() => {
-    if (selectedStaffInfo) {
-      return buildServiceDurationLookup([selectedStaffInfo]);
-    }
-    return buildServiceDurationLookup(businessStaff);
-  }, [selectedStaffInfo, businessStaff]);
-
   const isServiceAssignedToAnyStaff = useCallback((service) => {
     const serviceId = toServiceIdentifier(service);
     if (!serviceId) return false;
@@ -191,27 +123,6 @@ export const Home = () => {
     const m = tc('serviceNotAssignedToAnyStaff');
     return m && m !== 'serviceNotAssignedToAnyStaff' ? m : 'This service is not assigned to any staff member till now';
   }, [tc]);
-
-  const getServiceDurationLabel = useCallback((service) => {
-    const serviceId = toServiceIdentifier(service);
-    if (serviceId) {
-      const staffMinutes = serviceDurationLookup.get(String(serviceId));
-      const staffLabel = staffMinutes ? formatMinutesLabel(staffMinutes) : undefined;
-      if (staffLabel) {
-        return staffLabel;
-      }
-    }
-
-    const minutesFromTimeInterval = parseMinutes(service?.timeInterval);
-    const minutesFromNumericDuration = typeof service?.duration === 'number' ? parseMinutes(service.duration) : undefined;
-    const minutesFromStringDuration = typeof service?.duration === 'string' ? parseMinutes(service.duration) : undefined;
-    const minutesFromObjectDuration = convertDurationObjectToMinutes(service?.duration);
-    const fallbackMinutes = minutesFromTimeInterval ?? minutesFromNumericDuration ?? minutesFromStringDuration ?? minutesFromObjectDuration;
-    const fallbackLabel = fallbackMinutes ? formatMinutesLabel(fallbackMinutes) : undefined;
-
-    return fallbackLabel || null;
-  }, [serviceDurationLookup]);
-  
 
   // Helper function to get coordinates from business data
   const getBusinessCoordinates = () => {
@@ -357,7 +268,6 @@ export const Home = () => {
           const barberData = JSON.parse(publicBarberData);
           
           setBusinessData(barberData.business);
-          setAllServices(barberData.services || []);
           setBusinessStaff(barberData.staff || []);
 
           const fallbackHours = barberData.business.businessHours;
@@ -376,7 +286,7 @@ export const Home = () => {
               if (staffHours) {
                 setBusinessHours(staffHours);
               }
-            } catch (hoursError) {
+            } catch {
               // Silently handle error
             }
           }
@@ -462,7 +372,7 @@ export const Home = () => {
               email: parsed.email || '',
               phone: parsed.phone || ''
             };
-          } catch (e) {
+          } catch {
             clientInfo = { _id: existingClientId };
           }
         } else {
@@ -479,16 +389,6 @@ export const Home = () => {
     setShowModal(true);
     }
     document.body.style.overflow = "hidden";
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setShowSignInModal(false);
-    setShowSignUpModal(false);
-    setShowForgotPasswordModal(false);
-    setShowStaffModal(false);
-    setSelectedService(null);
-    document.body.style.overflow = "auto";
   };
 
   const closeSignInModal = () => {
@@ -519,11 +419,6 @@ export const Home = () => {
     setShowModal(false);
     setSelectedService(null);
     document.body.style.overflow = "auto";
-  };
-
-  const clearStaffSelection = () => {
-    localStorage.removeItem('publicStaffId');
-    localStorage.removeItem('publicStaffInfo');
   };
 
   const handleSignInSuccess = (clientInfo) => {
@@ -566,7 +461,7 @@ export const Home = () => {
         if (staffHours) {
           setBusinessHours(staffHours);
         }
-      } catch (hoursError) {
+      } catch {
         // Silently handle error
       }
     }
@@ -634,7 +529,7 @@ export const Home = () => {
   }
 
   return (
-    <motion.div 
+    <MotionDiv 
       className="bg-transparent flex flex-row justify-center w-full" 
       style={{
         backgroundImage: `url(${background})`,
@@ -652,7 +547,7 @@ export const Home = () => {
           
           <div className="px-3 md:px-6 lg:px-8 xl:px-12 relative">
             
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[60%] xl:w-[55%] h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] mt-[100px] rounded-[16px] overflow-hidden relative float-none lg:float-left"
               variants={leftSlideVariant}
             >
@@ -717,9 +612,9 @@ export const Home = () => {
                   </div>
                 </div>
               )}
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[38%] xl:w-[40%] float-none lg:float-right mt-6 lg:mt-[100px]"
               variants={rightSlideVariant}
             >
@@ -965,9 +860,9 @@ export const Home = () => {
               
               </div>
               
-            </motion.div>         
+            </MotionDiv>         
 
-            <motion.div 
+            <MotionDiv 
               className="flex flex-col w-full lg:w-[56%] items-start gap-[4px] clear-both lg:clear-none pt-6 lg:pt-0"
               variants={fadeInUpVariant}
             >
@@ -992,9 +887,9 @@ export const Home = () => {
                   }
                 </p>
               </div>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="w-full sm:w-[280px] md:w-[300px] lg:w-[320px] mt-4 sm:mt-6 h-[36px] sm:h-[40px] bg-[#1b1d21] rounded-[40px] flex items-center px-2 sm:px-3 py-1.5 sm:py-2"
               variants={fadeInUpVariant}
             >
@@ -1009,9 +904,9 @@ export const Home = () => {
                   YOU CALENDY
                 </span>
               </span>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div 
+            <MotionDiv 
               className="flex flex-col w-full lg:w-[55%] items-start mt-6 sm:mt-8"
               variants={fadeInUpVariant}
             >
@@ -1033,11 +928,11 @@ export const Home = () => {
                   />
                 </div>
               </div>
-            </motion.div>
+            </MotionDiv>
 
             <div className="w-full lg:w-[55%] h-px mt-4 bg-gray-200" />
 
-            <motion.div 
+            <MotionDiv 
               className="w-full lg:w-[55%] mt-4 mb-6 sm:mb-8"
               variants={fadeInUpVariant}
             >
@@ -1052,7 +947,7 @@ export const Home = () => {
               
               <AnimatePresence>
                 {isAccordionOpen && (
-                  <motion.div 
+                  <MotionDiv 
                     className="w-full mt-4 overflow-hidden"
                     initial="hidden"
                     animate="visible"
@@ -1118,10 +1013,10 @@ export const Home = () => {
                         </p>
                       </div>
                     )}
-                  </motion.div>
+                  </MotionDiv>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </MotionDiv>
           </div>
         </div>
       </div>
@@ -1186,7 +1081,7 @@ export const Home = () => {
         </Suspense>
       ) : null}
       
-    </motion.div>
+    </MotionDiv>
   );
 };
 

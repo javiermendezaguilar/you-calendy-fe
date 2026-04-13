@@ -149,7 +149,7 @@ const NoteViewContent = ({ clientData, activeTab, onClose, onUpdated }) => {
     try {
       setSending(true);
       // For reports we can optionally include a status; keep minimal and only send response
-      const res = await businessAPI.respondToClientNote(clientData.id, { response: trimmed });
+      await businessAPI.respondToClientNote(clientData.id, { response: trimmed });
       toast.success(tc('responseSent') || 'Response sent');
       setReply("");
       // Update local item so chat shows immediately

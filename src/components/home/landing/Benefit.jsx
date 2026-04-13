@@ -18,6 +18,10 @@ import frame6 from "../../../assets/frame6.png";
 import bg2 from "../../../assets/keybenefits-bg.webp";
 import { motion } from "framer-motion";
 
+const MotionDiv = motion.div;
+const MotionTitle = motion.h1;
+const MotionText = motion.p;
+
 const benefits = [
   {
     title: "Appointment History",
@@ -94,7 +98,7 @@ const itemVariants = {
 
 function Benefits() {
   return (
-    <motion.div
+    <MotionDiv
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
@@ -117,19 +121,19 @@ function Benefits() {
         className="px-4 sm:px-6 md:px-8"
       >
         <Stack align="center" spacing="md" mb={{ base: 30, md: 50 }}>
-          <motion.h1
+          <MotionTitle
             variants={itemVariants}
             className="text-[#036] text-center text-4xl sm:text-5xl font-bold max-md:leading-[65px] max-sm:leading-[49px]"
           >
             Key Benefits
-          </motion.h1>
-          <motion.p
+          </MotionTitle>
+          <MotionText
             variants={itemVariants}
             className="text-[#333] text-center text-base sm:text-lg font-normal max-w-[840px] max-md:text-[22px] max-md:leading-7 max-sm:text-base max-sm:leading-6 px-2"
           >
             Effortlessly manage your organization with a feature-rich Super Admin
             panel designed for ultimate control, security, and efficiency.
-          </motion.p>
+          </MotionText>
         </Stack>
 
         <SimpleGrid
@@ -137,7 +141,7 @@ function Benefits() {
           spacing={{ base: "sm", sm: "md", md: "xl" }}
         >
           {benefits.map((benefit, index) => (
-            <motion.div variants={itemVariants} key={index}>
+            <MotionDiv variants={itemVariants} key={index}>
               <Card
                 padding={{ base: "md", md: "lg" }}
                 radius="md"
@@ -194,11 +198,11 @@ function Benefits() {
                   </Text>
                 </Stack>
               </Card>
-            </motion.div>
+            </MotionDiv>
           ))}
         </SimpleGrid>
       </Container>
-    </motion.div>
+    </MotionDiv>
   );
 }
 

@@ -7,6 +7,8 @@ import { clearInvitationToken } from '../../utils/invitationUtils';
 import { toast } from 'sonner';
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
 
+const MotionDiv = motion.div;
+
 const Footer = lazy(() => import("../../components/home/landing/Footer"));
 const Gallery = lazy(() => import("./Gallery"));
 const LazyClientProfile = lazy(() => import("./ClientProfile"));
@@ -22,7 +24,7 @@ const pageVariants = {
 
 const Homepage = () => {
   const { tc } = useBatchTranslation();
-  const [activeTab, setActiveTab] = useOutletContext();
+  const [activeTab] = useOutletContext();
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [clientData, setClientData] = useState(null);
@@ -180,7 +182,7 @@ const Homepage = () => {
     <div>
       <AnimatePresence mode="wait">
         {activeTab === "appointments" && (
-          <motion.div
+          <MotionDiv
             key="appointments"
             initial="initial"
             animate="animate"
@@ -196,11 +198,11 @@ const Homepage = () => {
                 <Gallery />
               </Suspense>
             </div>
-          </motion.div>
+          </MotionDiv>
         )}
 
         {activeTab === "profile" && (
-          <motion.div
+          <MotionDiv
             key="profile"
             initial="initial"
             animate="animate"
@@ -211,7 +213,7 @@ const Homepage = () => {
             <Suspense fallback={null}>
               <LazyClientProfile />
             </Suspense>
-          </motion.div>
+          </MotionDiv>
         )}
       </AnimatePresence>
 

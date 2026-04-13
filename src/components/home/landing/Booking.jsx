@@ -3,6 +3,8 @@ import booking from "../../../assets/booking-background.webp";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+const MotionHeader = motion.header;
+
 const HeroTitle = () => (
   <Title order={1} className="text-5xl font-semibold max-md:max-w-full max-md:text-[40px] max-md:leading-[53px]">
     Simplify Your Barber Business
@@ -34,7 +36,7 @@ const ActionButton = () => (
 
 const Booking = () => {
   return (
-    <motion.header
+    <MotionHeader
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, amount: 0.3 }}
@@ -58,7 +60,7 @@ const Booking = () => {
         </div>
         <ActionButton />
       </Container>
-    </motion.header>
+    </MotionHeader>
   );
 };
 

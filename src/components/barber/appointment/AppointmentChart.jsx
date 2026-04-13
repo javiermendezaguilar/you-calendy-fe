@@ -137,7 +137,7 @@ const AppointmentChart = ({ selectedDate: propsDate, onDateChange, selectedStaff
       const selectedYear = selectedDateObj.year();
 
 
-      revenueData?.revenueData?.forEach((item, index) => {
+      revenueData?.revenueData?.forEach((item) => {
         const parsed = dayjs(item.date);
         const itemYear = parsed.year();
         const monthIndex = parsed.month();
@@ -166,7 +166,7 @@ const AppointmentChart = ({ selectedDate: propsDate, onDateChange, selectedStaff
 
 
 
-    revenueData?.revenueData?.forEach((item, index) => {
+    revenueData?.revenueData?.forEach((item) => {
       const parsed = dayjs(item.date);
       const itemYear = parsed.year();
       const itemMonth = parsed.month();

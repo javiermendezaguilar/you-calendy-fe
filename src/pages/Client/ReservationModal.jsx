@@ -16,9 +16,6 @@ import { useGetActiveFlashSales, useGetActivePromotions } from '../../hooks/useM
 // Day names will be translated using tc() function in the component
 // daysOfWeekData removed as it's not used in the component
 
-const leftArrowImage = '/assets/left-arrow.svg'; 
-const rightArrowImage = '/assets/right-arrow.svg';
-
 const normalizeTimeFormatPreference = (format) => {
   const normalized = String(format || '').trim().toLowerCase();
   if (normalized.startsWith('24') || normalized.includes('military')) {
@@ -68,7 +65,7 @@ const formatDateObject = (date, normalizedPreference = '24h') => {
 
 // timeSlots will be replaced by dynamic availableSlots from API
 
-const PersonalizeView = ({ onBack, onSkip, onConfirm, service, day, time, total, duration, selectedDate, isBooking }) => {
+const PersonalizeView = ({ onSkip, onConfirm, isBooking }) => {
   const { tc } = useBatchTranslation();
   const [photos, setPhotos] = useState([]);
   const [instructions, setInstructions] = useState('');
@@ -370,7 +367,6 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
 
   const [staffInfo, setStaffInfo] = useState(null);
   const [clientData, setClientData] = useState(null);
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
   const [businessName, setBusinessName] = useState('');
@@ -411,8 +407,8 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
   });
 
   // Fetch active flash sales and promotions for discount calculation
-  const { data: activeFlashSales = [], isLoading: flashSalesLoading, error: flashSalesError } = useGetActiveFlashSales(businessId);
-  const { data: activePromotions = [], isLoading: promotionsLoading, error: promotionsError } = useGetActivePromotions(businessId, selectedDate);
+  const { data: activeFlashSales = [] } = useGetActiveFlashSales(businessId);
+  const { data: activePromotions = [] } = useGetActivePromotions(businessId, selectedDate);
 
   useEffect(() => {
     const nameFromClient = clientData?.business?.businessName || clientData?.business?.name;
@@ -699,16 +695,14 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
       const client = response.data?.data || response.data;
       
       if (client) {
-        setIsProfileComplete(client.isProfileComplete || false);
-        
         // Extract and store staff information if available
         if (client.staff) {
           setStaffInfo(client.staff);
           localStorage.setItem('clientStaffId', client.staff._id);
         }
       }
-    } catch (error) {
-      console.error(tc('errorLoadingClientProfile'), error);
+    } catch {
+      console.error(tc('errorLoadingClientProfile'));
     } finally {
       setIsLoadingProfile(false);
     }
@@ -787,13 +781,11 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
         if (profileComplete && client._id) {
           try {
             await clientLogin(client._id);
-          } catch (loginError) {
-            console.error(tc('errorAuthenticatingClient'), loginError);
+          } catch {
+            console.error(tc('errorAuthenticatingClient'));
             // Continue without authentication, user can still browse
           }
         }
-        
-        setIsProfileComplete(profileComplete);
         return profileComplete;
       }
       
@@ -872,7 +864,7 @@ const ReservationModal = ({ show, onClose, service, selectedStaffInfo, timeForma
       formData.append('clientNotes', selectedPastHaircut || '');
       
       // Append reference photos
-      photos.forEach((photo, index) => {
+      photos.forEach((photo) => {
         if (photo.file) {
           formData.append('referencePhotos', photo.file);
         }
