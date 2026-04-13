@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,7 +24,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Lint changed files on PR
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          mapfile -t changed_files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- '*.js' '*.jsx')
+
+          if [ "${#changed_files[@]}" -eq 0 ]; then
+            echo "No JS/JSX files changed in this PR"
+            exit 0
+          fi
+
+          printf '%s\n' "${changed_files[@]}"
+          npx eslint "${changed_files[@]}"
+
+      - name: Lint full repository on main
+        if: github.event_name != 'pull_request'
         run: npm run lint
 
       - name: Build
