@@ -18,28 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare report directory
-        run: |
-          mkdir -p zap-report
-          chmod 777 zap-report
-
       - name: Run ZAP baseline
-        run: |
-          docker run --rm \
-            -v "${PWD}/zap-report:/zap/wrk/:rw" \
-            ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py \
-            -t "${{ inputs.target_url }}" \
-            -J report.json \
-            -w report.md \
-            -r report.html \
-            -m 5 \
-            -a
-
-      - name: Upload ZAP report
-        if: always()
-        uses: actions/upload-artifact@v4
+        uses: zaproxy/action-baseline@v0.14.0
         with:
-          name: zap-baseline-report
-          path: zap-report/
-          if-no-files-found: error
+          target: ${{ inputs.target_url }}
+          cmd_options: "-a -m 5"
+          artifact_name: zap-baseline-report
+          allow_issue_writing: false
+          allow_comment_writing: false
