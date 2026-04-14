@@ -19,7 +19,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare report directory
-        run: mkdir -p zap-report
+        run: |
+          mkdir -p zap-report
+          chmod 777 zap-report
 
       - name: Run ZAP baseline
         run: |
