@@ -1,7 +1,13 @@
 import React, { useEffect } from "react";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+
 const queryClient = new QueryClient();
+let ReactQueryDevtools = null;
+
+if (import.meta.env.DEV) {
+  const devtoolsModule = await import("@tanstack/react-query-devtools");
+  ReactQueryDevtools = devtoolsModule.ReactQueryDevtools;
+}
 
 const QueryProvider = ({ children }) => {
   // Reset cache on auth changes to prevent cross-user stale data (e.g., subscription status)
@@ -22,9 +28,11 @@ const QueryProvider = ({ children }) => {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <div data-i18n-skip="true">
-        <ReactQueryDevtools initialIsOpen={false} />
-      </div>
+      {import.meta.env.DEV && ReactQueryDevtools ? (
+        <div data-i18n-skip="true">
+          <ReactQueryDevtools initialIsOpen={false} />
+        </div>
+      ) : null}
     </QueryClientProvider>
   );
 };

@@ -26,7 +26,7 @@ export const AnalyticsProvider = ({ children }) => {
    */
   const connectGoogleAnalytics = async (measurementId) => {
     try {
-      const success = gaService.initialize(measurementId);
+      const success = await gaService.initialize(measurementId);
       if (success) {
         // Save to backend
         const backendResult = await gaConfigService.saveConfiguration(measurementId);
@@ -89,7 +89,7 @@ export const AnalyticsProvider = ({ children }) => {
           const backendConfig = await gaConfigService.getConfiguration();
           if (backendConfig.success && backendConfig.data?.googleAnalyticsApiKey) {
             const backendMeasurementId = backendConfig.data.googleAnalyticsApiKey;
-            const success = gaService.initialize(backendMeasurementId);
+            const success = await gaService.initialize(backendMeasurementId);
             if (success) {
               setIsConnected(true);
               setMeasurementId(backendMeasurementId);
@@ -108,7 +108,7 @@ export const AnalyticsProvider = ({ children }) => {
       const savedConnectionStatus = localStorage.getItem('ga_connected');
       
       if (savedMeasurementId && savedConnectionStatus === 'true') {
-        const success = gaService.initialize(savedMeasurementId);
+        const success = await gaService.initialize(savedMeasurementId);
         if (success) {
           setIsConnected(true);
           setMeasurementId(savedMeasurementId);
