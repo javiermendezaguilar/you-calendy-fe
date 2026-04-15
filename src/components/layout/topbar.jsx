@@ -38,18 +38,6 @@ const Topbar = ({ subtitle, toggle, title }) => {
   );
 
   useEffect(() => {
-    try {
-      const userKey = isAdminPath ? "adminUser" : "user";
-      const storedUser = localStorage.getItem(userKey);
-      if (storedUser) {
-        JSON.parse(storedUser);
-      }
-    } catch (error) {
-      console.error("Failed to parse user from localStorage", error);
-    }
-  }, [isAdminPath]);
-
-  useEffect(() => {
     if (!isAdminPath) {
       refetchProfile();
     }
@@ -233,7 +221,9 @@ const Topbar = ({ subtitle, toggle, title }) => {
               <Menu.Dropdown>
                 <Menu.Item
                   onClick={() =>
-                    navigate(isAdmin ? "/admin/setting" : "/dashboard/setting")
+                    navigate(
+                      isAdminPath ? "/admin/setting" : "/dashboard/setting"
+                    )
                   }
                 >
                   {tc("profileSettings")}
