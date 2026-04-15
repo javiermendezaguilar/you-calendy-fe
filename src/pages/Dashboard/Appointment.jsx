@@ -1,9 +1,44 @@
-import React, { useState } from "react";
+import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import AppointmentChart from "../../components/barber/appointment/AppointmentChart";
 import Overview from "../../components/barber/appointment/Overview";
-import AppointmentsCalender from "../../components/barber/appointment/AppointmentsCalender";
 import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import dayjs from "dayjs";
+
+const AppointmentsCalender = lazy(() =>
+  import("../../components/barber/appointment/AppointmentsCalender")
+);
+
+const DeferredSection = ({ children, minHeight = 640, rootMargin = "250px 0px" }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (isVisible || !containerRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isVisible, rootMargin]);
+
+  return (
+    <div ref={containerRef} style={{ minHeight }}>
+      {isVisible ? children : null}
+    </div>
+  );
+};
 
 const Appointment = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs().startOf("month").toDate());
@@ -31,7 +66,11 @@ const Appointment = () => {
           </div>
         </div>
         <div className="bg-white rounded-2xl mt-4">
-          <AppointmentsCalender />
+          <DeferredSection>
+            <Suspense fallback={null}>
+              <AppointmentsCalender />
+            </Suspense>
+          </DeferredSection>
         </div>
       </div>
     </BatchTranslationLoader>
