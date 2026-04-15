@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail } from "lucide-react";
-import { Button, TextInput, PasswordInput, /* Divider, */ Text, Checkbox, Anchor } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import LazyFooter from "../../components/home/landing/LazyFooter";
 // Social login icons temporarily disabled
 // import { GoogleIcon, FacebookIcon } from "../../components/common/Svgs";
@@ -34,61 +32,45 @@ const ProgressBar = () => (
   </div>
 );
 
-const EmailLoginSection = ({ form, loading }) => {
+const FieldError = ({ message }) =>
+  message ? <p className="mt-1 text-sm text-red-600">{message}</p> : null;
+
+const EmailLoginSection = ({ values, errors, onChange, loading }) => {
   return (
     <div className="flex flex-col gap-3 w-full">
-      <TextInput
+      <div>
+        <input
+          name="email"
+          type="email"
         placeholder="Email"
-        radius="md"
-        size="md"
         aria-label="Email input"
-        styles={{
-          input: {
-            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.08)',
-            '&:focus': {
-              boxShadow: '0 0 0 2px rgba(47, 112, 239, 0.2)',
-            }
-          }
-        }}
-        {...form.getInputProps('email')}
-      />
-      <PasswordInput
+          value={values.email}
+          onChange={onChange}
+          className="h-[42px] w-full rounded-md border border-[#D9E0E7] bg-white px-3 text-sm text-[#323334] shadow-[0_2px_5px_rgba(0,0,0,0.08)] outline-none transition focus:border-[#2F70EF] focus:ring-2 focus:ring-[rgba(47,112,239,0.2)]"
+        />
+        <FieldError message={errors.email} />
+      </div>
+      <div>
+        <input
+          name="password"
+          type="password"
         placeholder="Password"
-        radius="md"
-        size="md"
-        mt="xs"
         aria-label="Password input"
-        styles={{
-          input: {
-            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.08)',
-            '&:focus': {
-              boxShadow: '0 0 0 2px rgba(47, 112, 239, 0.2)',
-            }
-          }
-        }}
-        {...form.getInputProps('password')}
-      />
-      <Button
-        fullWidth
-        size="md"
-        radius="md"
-        color="#323334"
-        leftSection={<Mail className="mr-2 h-4 w-4" />}
+          value={values.password}
+          onChange={onChange}
+          className="mt-1 h-[42px] w-full rounded-md border border-[#D9E0E7] bg-white px-3 text-sm text-[#323334] shadow-[0_2px_5px_rgba(0,0,0,0.08)] outline-none transition focus:border-[#2F70EF] focus:ring-2 focus:ring-[rgba(47,112,239,0.2)]"
+        />
+        <FieldError message={errors.password} />
+      </div>
+      <button
+        className="mt-1 flex h-[45px] w-full items-center justify-center rounded-[8px] bg-[#323334] px-4 text-[15px] font-medium text-white transition hover:bg-[#1f2021] disabled:cursor-not-allowed disabled:opacity-60"
         aria-label="Login with email"
         type="submit"
-        mt="xs"
-        loading={loading}
-        styles={{
-          root: {
-            height: '45px',
-            borderRadius: '8px',
-            fontWeight: 500,
-            fontSize: '15px',
-          }
-        }}
+        disabled={loading}
       >
+        <Mail className="mr-2 h-4 w-4" />
         Login With Email
-      </Button>
+      </button>
       
       <div className="mt-3 text-center">
         <Link to="/forgot-password" className="text-[#2F70EF] text-sm font-medium hover:underline">
@@ -97,12 +79,12 @@ const EmailLoginSection = ({ form, loading }) => {
       </div>
       
       <div className="mt-4 text-center">
-        <Text size="sm" c="#565656">
+        <p className="text-sm text-[#565656]">
           Don't have an account?{" "}
           <Link to="/registration" className="text-[#323334] font-medium hover:underline">
             Sign up
           </Link>
-        </Text>
+        </p>
       </div>
     </div>
   );
@@ -157,44 +139,40 @@ const EmailLoginSection = ({ form, loading }) => {
 
 const TermsCheckbox = ({ checked, onChange, error }) => (
   <div className="flex items-start sm:items-center w-full mt-3 bg-white p-3 rounded-lg">
-    <Checkbox
-      id="acceptTerms"
-      name="acceptTerms"
-      checked={checked}
-      onChange={onChange}
-      styles={{ 
-        input: { 
-          height: '1rem',
-          width: '1rem',
-          padding: '0.5rem',
-          borderColor: '#D1D5DB',
-          cursor: 'pointer'
-        },
-        label: { paddingLeft: '0.5rem' }
-      }}
-      color="#2F70EF"
-      label={
-        <Text size="xs" c="#565656">
-          I accept the{' '}
-          <Anchor href="#" c="#323334" fw={500} underline="hover" size="xs">
-            Terms Conditions
-          </Anchor>{' '}
-          and confirm that I have read the{' '}
-          <Anchor href="#" c="#323334" fw={500} underline="hover" size="xs">
-            Privacy Policy
-          </Anchor>
-          .
-        </Text>
-      }
-      aria-labelledby="terms-label"
-      size="sm"
-      error={error}
-    />
+    <label htmlFor="acceptTerms" className="flex cursor-pointer items-start gap-2">
+      <input
+        id="acceptTerms"
+        name="acceptTerms"
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        className="mt-0.5 h-4 w-4 cursor-pointer rounded border border-[#D1D5DB] accent-[#2F70EF]"
+        aria-labelledby="terms-label"
+      />
+      <span className="text-xs text-[#565656]">
+        I accept the{" "}
+        <a href="#" className="font-medium text-[#323334] hover:underline">
+          Terms Conditions
+        </a>{" "}
+        and confirm that I have read the{" "}
+        <a href="#" className="font-medium text-[#323334] hover:underline">
+          Privacy Policy
+        </a>
+        .
+      </span>
+    </label>
+    <FieldError message={error} />
   </div>
 );
 
 const Login = () => {
   const navigate = useNavigate();
+  const [values, setValues] = useState({
+    email: 'barber@gmail.com',
+    password: 'Password123',
+    acceptTerms: true,
+  });
+  const [errors, setErrors] = useState({});
   const [loadingStates, setLoadingStates] = useState({
     email: false,
     // google: false,
@@ -204,24 +182,46 @@ const Login = () => {
   const { mutateAsync: login } = useLogin();
   // const { mutateAsync: socialLogin } = useSocialLogin(); // disabled social login
 
-  const form = useForm({
-    initialValues: {
-      email: 'barber@gmail.com',
-      password: 'Password123',
-      acceptTerms: true,
-    },
-    validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Please enter a valid email address"),
-      password: (value) => (!value ? "Password is required" : value.length < 6 ? "Password must be at least 6 characters" : null),
-      acceptTerms: (value) => (!value ? "You must accept the terms and conditions" : null),
-    },
-  });
+  const validateForm = () => {
+    const nextErrors = {};
 
-  const handleLoginSubmit = async (values) => {
+    if (!/^\S+@\S+$/.test(values.email)) {
+      nextErrors.email = "Please enter a valid email address";
+    }
+
+    if (!values.password) {
+      nextErrors.password = "Password is required";
+    } else if (values.password.length < 6) {
+      nextErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (!values.acceptTerms) {
+      nextErrors.acceptTerms = "You must accept the terms and conditions";
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setValues((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    setErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const handleLoginSubmit = async (event) => {
+    event.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       setLoadingStates(prev => ({ ...prev, email: true }));
 
-      const response = await login({...values, userType: 'user'});
+      const response = await login({ ...values, userType: 'user' });
 
       if (response?.data?.user) {
         navigate("/dashboard");
@@ -252,13 +252,18 @@ const Login = () => {
               <h1 className="text-[#323334] text-center text-2xl sm:text-3xl font-bold leading-tight">
                 Welcome! First things first
               </h1>
-              <p className="text-[#7898AB] text-center text-sm font-normal leading-normal mt-2">
+              <p className="mt-2 text-center text-sm font-normal leading-normal text-[#7898AB]">
                 You can always change them later
               </p>
             </div>
-            <form onSubmit={form.onSubmit(handleLoginSubmit)} className="w-full">
+            <form onSubmit={handleLoginSubmit} className="w-full">
               <div className="flex flex-col items-center gap-2 w-full">
-                <EmailLoginSection form={form} loading={loadingStates.email} />
+                <EmailLoginSection
+                  values={values}
+                  errors={errors}
+                  onChange={handleChange}
+                  loading={loadingStates.email}
+                />
 
                 {/* Social login temporarily removed */}
                 {/* <Divider
@@ -283,9 +288,9 @@ const Login = () => {
                 
                 <div className="w-full mt-2">
                   <TermsCheckbox 
-                    checked={form.values.acceptTerms}
-                    onChange={(e) => form.setFieldValue('acceptTerms', e.currentTarget.checked)}
-                    error={form.errors.acceptTerms}
+                    checked={values.acceptTerms}
+                    onChange={handleChange}
+                    error={errors.acceptTerms}
                   />
                 </div>
               </div>

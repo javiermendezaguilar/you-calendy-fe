@@ -8,9 +8,15 @@ import React from "react";
 import { processInvitationFromUrl } from "./utils/invitationUtils";
 import GlobalBlockingLoader from "./components/common/GlobalBlockingLoader";
 import { isCurrentContextAuthenticated } from "./utils/authUtils";
+import { useLocation } from "react-router-dom";
+import { isLightweightPublicPath } from "./utils/routeRuntimeProfile";
 
 function App() {
+  const location = useLocation();
   const shouldInitializeAuthManager = isCurrentContextAuthenticated();
+  const shouldRenderGlobalBlockingLoader = !isLightweightPublicPath(
+    location.pathname
+  );
 
   // Enable automatic page tracking
   usePageTracking();
@@ -31,7 +37,9 @@ function App() {
   return (
     <>
       {/* Global blocking loader shows only on first truly blocking data fetch */}
-      <GlobalBlockingLoader delay={200} blockingQueryKeys={["subscriptionStatus", "me"]} />
+      {shouldRenderGlobalBlockingLoader ? (
+        <GlobalBlockingLoader delay={200} blockingQueryKeys={["subscriptionStatus", "me"]} />
+      ) : null}
       <Router />
     </>
   );

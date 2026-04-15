@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import React, { useEffect, useState } from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 const queryClient = new QueryClient();
 
 const QueryProvider = ({ children }) => {
+  const [ReactQueryDevtools, setReactQueryDevtools] = useState(null);
+
   // Reset cache on auth changes to prevent cross-user stale data (e.g., subscription status)
   useEffect(() => {
     const handler = () => {
@@ -19,12 +20,32 @@ const QueryProvider = ({ children }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
+    let mounted = true;
+
+    import("@tanstack/react-query-devtools").then((mod) => {
+      if (mounted) {
+        setReactQueryDevtools(() => mod.ReactQueryDevtools);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <div data-i18n-skip="true">
-        <ReactQueryDevtools initialIsOpen={false} />
-      </div>
+      {ReactQueryDevtools ? (
+        <div data-i18n-skip="true">
+          <ReactQueryDevtools initialIsOpen={false} />
+        </div>
+      ) : null}
     </QueryClientProvider>
   );
 };

@@ -5,12 +5,28 @@ import { isAdminAuthenticated } from '../utils/authUtils';
 
 const AnalyticsContext = createContext();
 
+const noop = () => {};
+const defaultAnalyticsContextValue = {
+  isConnected: false,
+  measurementId: null,
+  connectGoogleAnalytics: async () => ({ success: false, message: 'Analytics provider unavailable' }),
+  disconnectGoogleAnalytics: async () => {},
+  trackEvent: noop,
+  trackPageView: noop,
+  setUserProperties: noop,
+  trackAppointmentBooked: noop,
+  trackUserRegistration: noop,
+  trackLogin: noop,
+  trackServiceCreated: noop,
+  trackSubscriptionUpgrade: noop,
+  trackBusinessProfileCompleted: noop,
+  trackClientInviteSent: noop,
+  trackNotificationSent: noop,
+  trackConversion: noop
+};
+
 export const useAnalytics = () => {
-  const context = useContext(AnalyticsContext);
-  if (!context) {
-    throw new Error('useAnalytics must be used within an AnalyticsProvider');
-  }
-  return context;
+  return useContext(AnalyticsContext) || defaultAnalyticsContextValue;
 };
 
 export const AnalyticsProvider = ({ children }) => {
