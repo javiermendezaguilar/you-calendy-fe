@@ -24,7 +24,7 @@ const markAllAsRead = async () => {
   return data.data;
 };
 
-export const useNotifications = (userType = null) => {
+export const useNotifications = (userType = null, options = {}) => {
   const queryClient = useQueryClient();
 
   // Unified auth detection across contexts.
@@ -73,10 +73,12 @@ export const useNotifications = (userType = null) => {
     client: tokens.client || clientLoose,
   };
 
+  const runtimeEnabled = options.enabled ?? enabled;
+
   const { data: notificationsData, isLoading: isLoadingNotifications, refetch, ...rest } = useQuery({
     queryKey: ["notifications", userType],
     queryFn: () => fetchNotifications(userType),
-    enabled,
+    enabled: runtimeEnabled,
   });
 
   const { mutate: markAllRead, isLoading: isMarkingAsRead } = useMutation({
@@ -95,7 +97,7 @@ export const useNotifications = (userType = null) => {
     isMarkingAsRead,
     refetch,
     enableReason,
-    enabled,
+    enabled: runtimeEnabled,
     clientLoose,
     authStates: normalizedAuthStates,
     ...rest,

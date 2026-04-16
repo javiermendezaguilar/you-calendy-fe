@@ -22,19 +22,22 @@ const Topbar = ({ subtitle, toggle, title }) => {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [shouldHydrateNotifications, setShouldHydrateNotifications] =
+    useState(false);
   const isAdminPath = location.pathname.startsWith("/admin");
   const { mutate: logout } = useLogout(isAdminPath ? "admin" : "user");
 
   const { data: profileData, refetch: refetchProfile } =
     useGetProfileSettings();
-  const { data: adminData } = useAdminProfile();
+  const { data: adminData } = useAdminProfile({ enabled: isAdminPath });
 
   const profileImage = isAdminPath
     ? adminData?.profileImage || null
     : profileData?.data?.profileImage || null;
 
   const { notifications, markAllRead, isMarkingAsRead } = useNotifications(
-    isAdminPath ? "admin" : "client"
+    isAdminPath ? "admin" : "client",
+    { enabled: shouldHydrateNotifications || showNotifications }
   );
 
   useEffect(() => {
@@ -42,6 +45,27 @@ const Topbar = ({ subtitle, toggle, title }) => {
       refetchProfile();
     }
   }, [isAdminPath, refetchProfile]);
+
+  useEffect(() => {
+    if (showNotifications) {
+      setShouldHydrateNotifications(true);
+      return undefined;
+    }
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const idleId = window.requestIdleCallback(() => {
+        setShouldHydrateNotifications(true);
+      }, { timeout: 2000 });
+
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShouldHydrateNotifications(true);
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [showNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
