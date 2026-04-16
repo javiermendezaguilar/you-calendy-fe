@@ -47,7 +47,7 @@ const ensurePreviewBypassCookie = async (page) => {
 
   const setCookieHeader = response.headers()["set-cookie"];
   if (!setCookieHeader) {
-    throw new Error("Vercel bypass response did not return a Set-Cookie header");
+    return;
   }
 
   const [cookiePair] = setCookieHeader.split(";", 1);
