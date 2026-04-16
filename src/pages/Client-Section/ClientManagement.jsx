@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { Suspense, lazy, useState, useMemo } from "react";
 import {
   Box,
   Text,
@@ -18,7 +18,6 @@ import {
   Skeleton,
 } from "@mantine/core";
 import { FaSearch, FaPlus, FaUpload } from "react-icons/fa";
-import ClientTable from "../../components/layout/ClientTable";
 import CommonModal from "../../components/common/CommonModal";
 import DeleteClientModal from "../../components/common/DeleteClientModal";
 import InvitationModal from "../../components/modals/InvitationModal";
@@ -30,6 +29,8 @@ import { useGetClients, useDeleteClient, useResendInvitation, useUpdateClientSta
 import ClientProfileSidebar from "../../components/client/ClientProfileSidebar";
 import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
+
+const ClientTable = lazy(() => import("../../components/layout/ClientTable"));
 
 const ClientManagement = () => {
   const { tc } = useBatchTranslation();
@@ -336,15 +337,25 @@ const ClientManagement = () => {
                 ))}
               </Box>
             ) : (
-              <ClientTable
-                data={clientTableData}
-                handleDelete={openDeleteModal}
-                sortConfig={sortConfig}
-                onSort={handleSort}
-                onView={handleViewProfile}
-                onStatusUpdate={updateClientStatus}
-                onResendInvitation={handleResendInvitation}
-              />
+              <Suspense
+                fallback={
+                  <Box p="md">
+                    {[...Array(itemsPerPage)].map((_, index) => (
+                      <Skeleton key={index} height={20} mb="sm" radius="sm" />
+                    ))}
+                  </Box>
+                }
+              >
+                <ClientTable
+                  data={clientTableData}
+                  handleDelete={openDeleteModal}
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  onView={handleViewProfile}
+                  onStatusUpdate={updateClientStatus}
+                  onResendInvitation={handleResendInvitation}
+                />
+              </Suspense>
             )}
           </Box>
           <Flex
