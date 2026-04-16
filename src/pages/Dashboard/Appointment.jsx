@@ -1,11 +1,13 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import AppointmentChart from "../../components/barber/appointment/AppointmentChart";
-import Overview from "../../components/barber/appointment/Overview";
 import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import dayjs from "dayjs";
 
 const AppointmentsCalender = lazy(() =>
   import("../../components/barber/appointment/AppointmentsCalender")
+);
+const Overview = lazy(() =>
+  import("../../components/barber/appointment/Overview")
 );
 
 const DeferredSection = ({ children, minHeight = 640, rootMargin = "250px 0px" }) => {
@@ -57,12 +59,22 @@ const Appointment = () => {
             />
           </div>
           <div>
-            <Overview 
-              selectedDate={selectedDate} 
-              onDateChange={setSelectedDate}
-              staffId={selectedStaffId}
-              onStaffChange={setSelectedStaffId}
-            />
+            <Suspense
+              fallback={
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-32 rounded-xl bg-slate-100 animate-pulse" />
+                  <div className="h-32 rounded-xl bg-slate-100 animate-pulse" />
+                  <div className="col-span-2 h-48 rounded-xl bg-slate-100 animate-pulse" />
+                </div>
+              }
+            >
+              <Overview
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                staffId={selectedStaffId}
+                onStaffChange={setSelectedStaffId}
+              />
+            </Suspense>
           </div>
         </div>
         <div className="bg-white rounded-2xl mt-4">
