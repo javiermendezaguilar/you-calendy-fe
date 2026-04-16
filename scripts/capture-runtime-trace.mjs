@@ -16,6 +16,7 @@ const VERCEL_SET_BYPASS_COOKIE = process.env.SMOKE_VERCEL_SET_BYPASS_COOKIE || "
 const OUTPUT_DIR = path.resolve(process.cwd(), "artifacts", "runtime-trace");
 const TRACE_PATH = path.join(OUTPUT_DIR, "dashboard-clients-trace.json");
 const SUMMARY_PATH = path.join(OUTPUT_DIR, "dashboard-clients-summary.json");
+const NETWORK_PATH = path.join(OUTPUT_DIR, "dashboard-clients-network.json");
 
 if (!BARBER_EMAIL || !BARBER_PASSWORD) {
   throw new Error("SMOKE_BARBER_EMAIL and SMOKE_BARBER_PASSWORD are required");
@@ -65,6 +66,24 @@ const toMetricMap = (metrics) =>
 
 const rounded = (value) => (Number.isFinite(value) ? Number(value.toFixed(2)) : null);
 
+const getOriginKind = (url) => {
+  const origin = new URL(url).origin;
+  if (origin === API_ORIGIN) {
+    return "api";
+  }
+
+  if (origin === BASE_ORIGIN) {
+    return "frontend";
+  }
+
+  return null;
+};
+
+const toRequestPath = (url) => {
+  const parsedUrl = new URL(url);
+  return `${parsedUrl.pathname}${parsedUrl.search}`;
+};
+
 const getResourceSummary = async (page) =>
   page.evaluate(() => {
     const resources = performance.getEntriesByType("resource");
@@ -102,7 +121,7 @@ const main = async () => {
     await page.locator("body").getByText(/client|clients/i).first().waitFor({ timeout: 20_000 });
 
     const beforeMetrics = toMetricMap((await client.send("Performance.getMetrics")).metrics);
-    const traceStart = Date.now();
+    let traceStart = 0;
 
     await browser.startTracing(page, {
       path: TRACE_PATH,
@@ -110,24 +129,86 @@ const main = async () => {
     });
 
     let responses = 0;
-    const onResponse = (response) => {
-      const responseOrigin = new URL(response.url()).origin;
-      if (responseOrigin === BASE_ORIGIN || responseOrigin === API_ORIGIN) {
-        responses += 1;
+    const trackedRequests = new Map();
+    const trackRequest = (request) => {
+      const originKind = getOriginKind(request.url());
+      if (!originKind) {
+        return;
       }
+
+      trackedRequests.set(request, {
+        url: request.url(),
+        path: toRequestPath(request.url()),
+        originKind,
+        method: request.method(),
+        resourceType: request.resourceType(),
+        startTimeMs: rounded(Date.now() - traceStart),
+      });
     };
 
+    const onResponse = (response) => {
+      const request = response.request();
+      const trackedRequest = trackedRequests.get(request);
+      if (!trackedRequest) {
+        return;
+      }
+
+      responses += 1;
+      trackedRequest.status = response.status();
+      trackedRequest.responseTimeMs = rounded(Date.now() - traceStart);
+      trackedRequest.ttfbMs = rounded(
+        trackedRequest.responseTimeMs - trackedRequest.startTimeMs,
+      );
+    };
+    const onRequestFinished = (request) => {
+      const trackedRequest = trackedRequests.get(request);
+      if (!trackedRequest) {
+        return;
+      }
+
+      trackedRequest.endTimeMs = rounded(Date.now() - traceStart);
+      trackedRequest.totalMs = rounded(
+        trackedRequest.endTimeMs - trackedRequest.startTimeMs,
+      );
+      trackedRequest.failureText = null;
+    };
+    const onRequestFailed = (request) => {
+      const trackedRequest = trackedRequests.get(request);
+      if (!trackedRequest) {
+        return;
+      }
+
+      trackedRequest.endTimeMs = rounded(Date.now() - traceStart);
+      trackedRequest.totalMs = rounded(
+        trackedRequest.endTimeMs - trackedRequest.startTimeMs,
+      );
+      trackedRequest.failureText = request.failure()?.errorText || "unknown";
+    };
+
+    traceStart = Date.now();
+    page.on("request", trackRequest);
     page.on("response", onResponse);
+    page.on("requestfinished", onRequestFinished);
+    page.on("requestfailed", onRequestFailed);
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.locator("body").getByText(/client|clients/i).first().waitFor({ timeout: 20_000 });
     await page.waitForLoadState("networkidle").catch(() => {});
+    page.off("request", trackRequest);
     page.off("response", onResponse);
+    page.off("requestfinished", onRequestFinished);
+    page.off("requestfailed", onRequestFailed);
 
     await browser.stopTracing();
 
     const afterMetrics = toMetricMap((await client.send("Performance.getMetrics")).metrics);
     const resources = await getResourceSummary(page);
     const traceDurationMs = Date.now() - traceStart;
+    const networkEntries = [...trackedRequests.values()].sort(
+      (left, right) => left.startTimeMs - right.startTimeMs,
+    );
+    const apiRequests = networkEntries
+      .filter((entry) => entry.originKind === "api")
+      .map(({ url, ...entry }) => entry);
 
     const summary = {
       generatedAt: new Date().toISOString(),
@@ -150,9 +231,11 @@ const main = async () => {
         jsHeapUsedSizeKb: rounded((afterMetrics.JSHeapUsedSize || 0) / 1024),
         nodes: rounded(afterMetrics.Nodes || 0),
       },
+      apiRequests,
     };
 
     await fs.writeFile(SUMMARY_PATH, `${JSON.stringify(summary, null, 2)}\n`, "utf8");
+    await fs.writeFile(NETWORK_PATH, `${JSON.stringify(networkEntries, null, 2)}\n`, "utf8");
     console.log(JSON.stringify(summary, null, 2));
   } finally {
     await context.close();
