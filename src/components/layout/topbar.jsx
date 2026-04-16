@@ -27,7 +27,7 @@ const Topbar = ({ subtitle, toggle, title }) => {
 
   const { data: profileData, refetch: refetchProfile } =
     useGetProfileSettings();
-  const { data: adminData } = useAdminProfile();
+  const { data: adminData } = useAdminProfile({ enabled: isAdminPath });
 
   const profileImage = isAdminPath
     ? adminData?.profileImage || null
