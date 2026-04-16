@@ -6,6 +6,7 @@ import { chromium } from "@playwright/test";
 const BASE_URL = process.env.RUNTIME_BASE_URL || "https://staging.groomnest.com";
 const API_URL = process.env.RUNTIME_API_URL || "https://api.groomnest.com";
 const BASE_ORIGIN = new URL(BASE_URL).origin;
+const API_ORIGIN = new URL(API_URL).origin;
 const BARBER_EMAIL = process.env.SMOKE_BARBER_EMAIL;
 const BARBER_PASSWORD = process.env.SMOKE_BARBER_PASSWORD;
 const VERCEL_PROTECTION_BYPASS =
@@ -110,8 +111,8 @@ const main = async () => {
 
     let responses = 0;
     const onResponse = (response) => {
-      const url = response.url();
-      if (url.startsWith(BASE_ORIGIN) || url.startsWith(API_URL)) {
+      const responseOrigin = new URL(response.url()).origin;
+      if (responseOrigin === BASE_ORIGIN || responseOrigin === API_ORIGIN) {
         responses += 1;
       }
     };
