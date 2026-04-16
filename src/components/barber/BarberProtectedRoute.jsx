@@ -68,10 +68,6 @@ const BarberProtectedRoute = ({ children }) => {
     return () => t && clearTimeout(t);
   }, [pendingRefetch, refetchStartTime]);
 
-  if (showInitialLoader) {
-    return <BrandLoader label="Loading" fullscreen />;
-  }
-
   // If status cannot be verified or indicates no valid access, redirect to subscription required page
   if (error) {
     return <Navigate to="/subscription-required" replace />;
@@ -102,6 +98,24 @@ const BarberProtectedRoute = ({ children }) => {
       return children;
     }
     return <Navigate to="/subscription-required" replace />;
+  }
+
+  if (showInitialLoader) {
+    return (
+      <>
+        <div
+          aria-hidden="true"
+          style={{
+            visibility: "hidden",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          {children}
+        </div>
+        <BrandLoader label="Loading" fullscreen />
+      </>
+    );
   }
 
   // User is authenticated and has barber privileges
