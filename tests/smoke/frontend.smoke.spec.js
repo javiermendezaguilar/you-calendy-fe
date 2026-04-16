@@ -159,7 +159,6 @@ const ensurePreviewBypassCookie = async (page) => {
       name: cookieName,
       value: cookieValue,
       url: BASE_ORIGIN,
-      path: "/",
       httpOnly: true,
       secure: true,
       sameSite: "Lax",
