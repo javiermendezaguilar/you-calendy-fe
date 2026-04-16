@@ -4,6 +4,16 @@ import { toast } from "sonner";
 import { useBatchTranslation } from "../contexts/BatchTranslationContext";
 import { getCurrentUser } from "../utils/authUtils";
 
+export const SUBSCRIPTION_STATUS_STALE_TIME = 60 * 1000;
+export const getSubscriptionStatusQueryKey = (userId) => [
+  "subscriptionStatus",
+  userId || "unknown",
+];
+export const fetchSubscriptionStatus = async () => {
+  const response = await businessAPI.getSubscriptionStatus();
+  return response.data;
+};
+
 // Get subscription status
 export const useSubscriptionStatus = () => {
   // Protected barber routes are gated by local auth state before mounting.
@@ -13,16 +23,13 @@ export const useSubscriptionStatus = () => {
   const user = storedUser || null;
 
   return useQuery({
-    queryKey: ["subscriptionStatus", userId || "unknown"],
-    queryFn: async () => {
-      const response = await businessAPI.getSubscriptionStatus();
-      return response.data;
-    },
-    // Always refetch on mount/focus so new accounts get fresh status immediately
-    staleTime: 0,
-    cacheTime: 5 * 60 * 1000,
-    refetchOnMount: "always",
-    refetchOnWindowFocus: "always",
+    queryKey: getSubscriptionStatusQueryKey(userId),
+    queryFn: fetchSubscriptionStatus,
+    // Subscription does not change frequently enough to justify a hard block on every mount.
+    staleTime: SUBSCRIPTION_STATUS_STALE_TIME,
+    gcTime: 5 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     enabled: !!user, // only run when user data exists (authentication via cookies)
   });

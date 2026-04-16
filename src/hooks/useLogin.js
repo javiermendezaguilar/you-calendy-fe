@@ -1,9 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import custAxios, { formAxios } from "../configs/axios.config";
+import { queryClient } from "../configs/query.config";
 import { toast } from "sonner";
 import { useBatchTranslation } from "../contexts/BatchTranslationContext";
 import batchTranslationService from "../services/batchTranslationService";
 import { sanitizeAndStringifyUser } from "../utils/userDataSanitizer";
+import {
+  fetchSubscriptionStatus,
+  getSubscriptionStatusQueryKey,
+  SUBSCRIPTION_STATUS_STALE_TIME,
+} from "./useSubscription";
 
 export const useLogin = (userType = "user") => {
   const { tc, changeLanguage } = useBatchTranslation();
@@ -37,6 +43,16 @@ export const useLogin = (userType = "user") => {
       return res.data;
     },
     onSuccess: (data) => {
+      const subscriptionUserId = data?.data?.user?._id || data?.data?.user?.id;
+
+      if (userType !== "admin" && subscriptionUserId) {
+        void queryClient.prefetchQuery({
+          queryKey: getSubscriptionStatusQueryKey(subscriptionUserId),
+          queryFn: fetchSubscriptionStatus,
+          staleTime: SUBSCRIPTION_STATUS_STALE_TIME,
+        });
+      }
+
       // Use language from API user object when available
       // Only allow 'en' or 'es' - filter out invalid languages like 'fr'
       const validLanguages = ['en', 'es'];
