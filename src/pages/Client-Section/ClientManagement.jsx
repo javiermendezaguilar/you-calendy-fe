@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { Suspense, lazy, useState, useMemo } from "react";
 import {
   Box,
   Text,
@@ -27,9 +27,10 @@ import { FiChevronDown } from "react-icons/fi";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetClients, useDeleteClient, useResendInvitation, useUpdateClientStatus } from "../../hooks/useClients";
-import ClientProfileSidebar from "../../components/client/ClientProfileSidebar";
 import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
+
+const ClientProfileSidebar = lazy(() => import("../../components/client/ClientProfileSidebar"));
 
 const ClientManagement = () => {
   const { tc } = useBatchTranslation();
@@ -430,7 +431,11 @@ const ClientManagement = () => {
           overlay: "!border-none"
         }}
       >
-        <ClientProfileSidebar client={selectedClient} onClose={closeProfileSidebar} />
+        {profileSidebarOpened ? (
+          <Suspense fallback={null}>
+            <ClientProfileSidebar client={selectedClient} onClose={closeProfileSidebar} />
+          </Suspense>
+        ) : null}
       </Drawer>
 
       {/* Invitation Modal */}
