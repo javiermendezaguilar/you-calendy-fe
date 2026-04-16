@@ -44,7 +44,7 @@ export const useNotifications = (userType = null, options = {}) => {
     if (!tokens.client && clientId && (path.startsWith('/client') || path.startsWith('/barber/profile/') || path.startsWith('/barber/'))) {
       clientLoose = true;
     }
-  } catch (_) {
+  } catch {
     /* noop */
   }
 
