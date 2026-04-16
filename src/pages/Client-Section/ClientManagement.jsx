@@ -28,7 +28,6 @@ import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGetClients, useDeleteClient, useResendInvitation, useUpdateClientStatus } from "../../hooks/useClients";
 import ClientProfileSidebar from "../../components/client/ClientProfileSidebar";
-import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
 
 const ClientManagement = () => {
@@ -195,7 +194,6 @@ const ClientManagement = () => {
 
 
   return (
-    <BatchTranslationLoader>
       <Box component="main" className="!h-[83vh] !overflow-auto">
       <Paper radius="lg" sx={{ padding: "24px", margin: "24px" }}>
         <Container size="xl" px={0} sx={{ width: "100%", maxWidth: "100%" }}>
@@ -443,7 +441,6 @@ const ClientManagement = () => {
         invitationData={invitationData}
       />
       </Box>
-    </BatchTranslationLoader>
   );
 };
 
