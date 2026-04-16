@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run ZAP baseline
-        uses: zaproxy/action-baseline@v0.14.0
+        uses: zaproxy/action-baseline@v0.15.0
         with:
           target: ${{ inputs.target_url }}
           cmd_options: "-a -m 5"
