@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import AdminProtectedRoute from "../components/admin/AdminProtectedRoute";
 import BarberProtectedRoute from "../components/barber/BarberProtectedRoute";
+import BarberSubscriptionGate from "../components/barber/BarberSubscriptionGate";
 import BrandLoader from "../components/common/BrandLoader";
 const HomeLayout = lazy(() => import("../layouts/HomeLayout"));
 const LandingPage = lazy(() => import("../pages/home/LandingPage"));
@@ -76,6 +77,10 @@ const Support = lazy(() => import("../pages/Admin/Support"));
 const Security = lazy(() => import("../pages/Admin/Security"));
 const ProposedInterfaces = lazy(() => import("../pages/Admin/ProposedInterfaces"));
 
+const withSubscription = (element) => (
+  <BarberSubscriptionGate>{element}</BarberSubscriptionGate>
+);
+
 const Router = () => {
   return (
     <Suspense fallback={<BrandLoader label="Loading" fullscreen />}>
@@ -114,49 +119,49 @@ const Router = () => {
         <Route path="/dashboard" element={<Appointment />} />
         <Route
           path="/dashboard/create-appointment"
-          element={<CreateAppointment />}
+          element={withSubscription(<CreateAppointment />)}
         />
 
 
-        <Route path="/dashboard/marketing" element={<Marketing />} />
+        <Route path="/dashboard/marketing" element={withSubscription(<Marketing />)} />
         <Route
           path="/dashboard/marketing/message-blast"
-          element={<MessageBlast />}
+          element={withSubscription(<MessageBlast />)}
         />
-        <Route path="/dashboard/marketing/promotions" element={<Promotion />} />
+        <Route path="/dashboard/marketing/promotions" element={withSubscription(<Promotion />)} />
         <Route
           path="/dashboard/marketing/promotions/flash-sale"
-          element={<FlashSale />}
+          element={withSubscription(<FlashSale />)}
         />
         <Route
           path="/dashboard/marketing/promotions/happy-hours"
-          element={<HappyHours />}
+          element={withSubscription(<HappyHours />)}
         />
-        <Route path="/dashboard/clients" element={<UserClientManagement />} />
-        <Route path="/dashboard/clients/invite" element={<ClientSection />} />
+        <Route path="/dashboard/clients" element={withSubscription(<UserClientManagement />)} />
+        <Route path="/dashboard/clients/invite" element={withSubscription(<ClientSection />)} />
 
 
 
         <Route
           path="/dashboard/clients/add"
-          element={<AddYourClients />}
+          element={withSubscription(<AddYourClients />)}
         />
         <Route
           path="/dashboard/client-section/edit/:clientId"
-          element={<EditClient />}
+          element={withSubscription(<EditClient />)}
         />
 
         <Route
           path="/dashboard/staff-management"
-          element={<StaffManagement />}
+          element={withSubscription(<StaffManagement />)}
         />
         <Route
           path="/dashboard/staff-management/add-member"
-          element={<AddStaffMember />}
+          element={withSubscription(<AddStaffMember />)}
         />
         <Route
           path="/dashboard/staff-management/edit-member/:id"
-          element={<EditStaffMember />}
+          element={withSubscription(<EditStaffMember />)}
         />
 
         {/* <Route
@@ -198,7 +203,7 @@ const Router = () => {
           element={<ServiceSetup />}
         />
         <Route path="/dashboard/support" element={<Tickets />} />
-        <Route path="/dashboard/create-ticket" element={<CreateTicket />} />
+        <Route path="/dashboard/create-ticket" element={withSubscription(<CreateTicket />)} />
         <Route
           path="/dashboard/business-setting/add-service"
           element={<AddServices />}
@@ -215,11 +220,11 @@ const Router = () => {
 
         <Route
           path="/dashboard/clients-note"
-          element={<ClientsNote />}
+          element={withSubscription(<ClientsNote />)}
         />
         <Route
           path="/dashboard/purchase-credits"
-          element={<PurchaseCredits />}
+          element={withSubscription(<PurchaseCredits />)}
         />
         <Route
           path="/dashboard/subscription-status"
