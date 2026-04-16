@@ -21,7 +21,7 @@
     "@mantine/form": "^7.17.7",
     "@mantine/hooks": "^7.17.7",
     "@mantine/modals": "^7.17.7",
-    "@mantine/notifications": "^7.17.7",
+    "@mantine/notifications": "^9.0.2",
     "@react-google-maps/api": "^2.20.8",
     "@reduxjs/toolkit": "^2.2.6",
     "@sentry/react": "^10.47.0",
