@@ -36,8 +36,9 @@ const BarberProtectedRoute = ({ children }) => {
     initialResolvedRef.current = true;
   }
 
-  // Show full-screen loader ONLY before first resolution
-  const showInitialLoader = !initialResolvedRef.current && (isLoading || isFetching) && !hasResolved;
+  // Keep children mounted while the first subscription check resolves so page queries
+  // can start earlier, but cover the UI with a blocking loader to avoid visual flashes.
+  const showInitialOverlay = !initialResolvedRef.current && (isLoading || isFetching) && !hasResolved;
   // After initial resolution, keep children mounted; show tiny overlay on background refetches
   const pendingRefetch = initialResolvedRef.current && isFetching && !isLoading;
 
@@ -68,10 +69,6 @@ const BarberProtectedRoute = ({ children }) => {
     return () => t && clearTimeout(t);
   }, [pendingRefetch, refetchStartTime]);
 
-  if (showInitialLoader) {
-    return <BrandLoader label="Loading" fullscreen />;
-  }
-
   // If status cannot be verified or indicates no valid access, redirect to subscription required page
   if (error) {
     return <Navigate to="/subscription-required" replace />;
@@ -99,7 +96,12 @@ const BarberProtectedRoute = ({ children }) => {
 
   if (!allowed) {
     if (isTrialAvailable && isOnboarding) {
-      return children;
+      return (
+        <>
+          {children}
+          {showInitialOverlay ? <BrandLoader label="Loading" fullscreen /> : null}
+        </>
+      );
     }
     return <Navigate to="/subscription-required" replace />;
   }
@@ -108,6 +110,7 @@ const BarberProtectedRoute = ({ children }) => {
   return (
     <>
       {children}
+      {showInitialOverlay ? <BrandLoader label="Loading" fullscreen /> : null}
       {showRefetchOverlay && (
         <div
           style={{
