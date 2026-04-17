@@ -78,6 +78,13 @@ const getResourceSummary = async (page) =>
     };
   });
 
+const waitForClientsFirstUsable = async (page) => {
+  await page
+    .locator('[data-testid="clients-table-ready"], [data-testid="clients-table-empty"]')
+    .first()
+    .waitFor({ timeout: 20_000 });
+};
+
 const main = async () => {
   await fs.mkdir(OUTPUT_DIR, { recursive: true });
 
@@ -99,7 +106,7 @@ const main = async () => {
     await page.waitForLoadState("networkidle").catch(() => {});
 
     await page.goto(`${BASE_URL}/dashboard/clients`, { waitUntil: "domcontentloaded" });
-    await page.locator("body").getByText(/client|clients/i).first().waitFor({ timeout: 20_000 });
+    await waitForClientsFirstUsable(page);
 
     const beforeMetrics = toMetricMap((await client.send("Performance.getMetrics")).metrics);
     const traceStart = Date.now();
@@ -119,7 +126,8 @@ const main = async () => {
 
     page.on("response", onResponse);
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.locator("body").getByText(/client|clients/i).first().waitFor({ timeout: 20_000 });
+    await waitForClientsFirstUsable(page);
+    const firstUsableMs = Date.now() - traceStart;
     await page.waitForLoadState("networkidle").catch(() => {});
     page.off("response", onResponse);
 
@@ -136,6 +144,7 @@ const main = async () => {
       route: "/dashboard/clients",
       tracePath: path.basename(TRACE_PATH),
       measuredReload: {
+        firstUsableMs,
         durationMs: traceDurationMs,
         responses,
         ...resources,

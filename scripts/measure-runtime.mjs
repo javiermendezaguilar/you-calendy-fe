@@ -31,6 +31,13 @@ const countUsefulResources = async (page) => {
   });
 };
 
+const waitForClientsFirstUsable = async (page) => {
+  await page
+    .locator('[data-testid="clients-table-ready"], [data-testid="clients-table-empty"]')
+    .first()
+    .waitFor({ timeout: 20_000 });
+};
+
 const ensurePreviewBypassCookie = async (page) => {
   if (!VERCEL_PROTECTION_BYPASS || !BASE_URL.startsWith("https://")) {
     return;
@@ -70,7 +77,7 @@ const ensurePreviewBypassCookie = async (page) => {
   ]);
 };
 
-const measureStep = async (page, label, action) => {
+const measureStep = async (page, label, action, options = {}) => {
   let responses = 0;
   const onResponse = (response) => {
     const url = response.url();
@@ -85,7 +92,8 @@ const measureStep = async (page, label, action) => {
   });
 
   const startedAt = Date.now();
-  await action();
+  const actionResult = await action();
+  const firstUsableMs = options.firstUsableWait ? Date.now() - startedAt : null;
   await page.waitForLoadState("networkidle").catch(() => {});
   const durationMs = Date.now() - startedAt;
 
@@ -96,8 +104,10 @@ const measureStep = async (page, label, action) => {
     label,
     finalUrl: page.url(),
     durationMs,
+    firstUsableMs,
     responses,
     ...resources,
+    ...(actionResult && typeof actionResult === "object" ? actionResult : {}),
   };
 };
 
@@ -133,8 +143,8 @@ const main = async () => {
     results.push(
       await measureStep(page, "dashboard_clients", async () => {
         await page.goto(`${BASE_URL}/dashboard/clients`, { waitUntil: "domcontentloaded" });
-        await page.locator("body").getByText(/client|clients/i).first().waitFor({ timeout: 20_000 });
-      }),
+        await waitForClientsFirstUsable(page);
+      }, { firstUsableWait: true }),
     );
 
     const payload = {

@@ -365,23 +365,25 @@ const ClientManagement = () => {
               </Popover>
             </Group>
           </Flex>
-          <Box mt="lg" style={{ overflowX: "auto" }}>
+          <Box mt="lg" style={{ overflowX: "auto" }} data-testid="clients-table-region">
             {isLoading ? (
-              <Box p="md">
+              <Box p="md" data-testid="clients-table-loading">
                 {[...Array(itemsPerPage)].map((_, index) => (
                   <Skeleton key={index} height={20} mb="sm" radius="sm" />
                 ))}
               </Box>
             ) : (
-              <ClientTable
-                data={clientTableData}
-                handleDelete={openDeleteModal}
-                sortConfig={sortConfig}
-                onSort={handleSort}
-                onView={handleViewProfile}
-                onStatusUpdate={updateClientStatus}
-                onResendInvitation={handleResendInvitation}
-              />
+              <Box data-testid={clients.length > 0 ? "clients-table-ready" : "clients-table-empty"}>
+                <ClientTable
+                  data={clientTableData}
+                  handleDelete={openDeleteModal}
+                  sortConfig={sortConfig}
+                  onSort={handleSort}
+                  onView={handleViewProfile}
+                  onStatusUpdate={updateClientStatus}
+                  onResendInvitation={handleResendInvitation}
+                />
+              </Box>
             )}
           </Box>
           <Flex
