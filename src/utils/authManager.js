@@ -28,10 +28,14 @@ class AuthManager {
   /**
    * Initialize the authentication manager
    */
-  init() {
+  init(options = {}) {
+    const { skipInitialValidation = false } = options;
+
     this.startHeartbeat();
     this.setupStorageListener();
-    this.validateCurrentSession();
+    if (!skipInitialValidation) {
+      this.validateCurrentSession();
+    }
     
     // Start localStorage data monitoring
     this.dataMonitorCleanup = startDataMonitoring();
