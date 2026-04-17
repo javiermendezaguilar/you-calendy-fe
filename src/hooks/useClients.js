@@ -227,10 +227,10 @@ const useResendInvitation = () => {
   const queryClient = useQueryClient();
   const { tc } = useBatchTranslation();
   return useMutation({
-    mutationFn: (clientId, options) => {
+    mutationFn: (clientId) => {
       return axiosInstance.post(`/business/clients/${clientId}/resend-invitation`);
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables) => {
       // Check if SMS was not sent due to insufficient credits
       const responseData = data?.data?.data;
       const smsNotSent = responseData?.smsStatus && !responseData.smsStatus.sent;

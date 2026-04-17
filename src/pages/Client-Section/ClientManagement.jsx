@@ -109,7 +109,7 @@ const ClientManagement = () => {
       closeDeleteModal();
     },
   });
-  const { mutate: resendInvitation, isLoading: isResending } = useResendInvitation();
+  const { mutate: resendInvitation } = useResendInvitation();
   const { mutate: updateClientStatus } = useUpdateClientStatus();
 
   // Extract clients and pagination data from response
