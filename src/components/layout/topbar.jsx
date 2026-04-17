@@ -15,7 +15,7 @@ const TopbarNotificationsPanel = lazy(() =>
   import("./TopbarNotificationsPanel")
 );
 
-const Topbar = ({ subtitle, toggle, title }) => {
+const Topbar = ({ subtitle, toggle, title, deferNonCriticalData = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { tc } = useBatchTranslation();
@@ -23,25 +23,29 @@ const Topbar = ({ subtitle, toggle, title }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const isAdminPath = location.pathname.startsWith("/admin");
+  const shouldLoadTopbarData = !deferNonCriticalData;
   const { mutate: logout } = useLogout(isAdminPath ? "admin" : "user");
 
   const { data: profileData, refetch: refetchProfile } =
-    useGetProfileSettings();
-  const { data: adminData } = useAdminProfile();
+    useGetProfileSettings({ enabled: shouldLoadTopbarData && !isAdminPath });
+  const { data: adminData } = useAdminProfile({
+    enabled: shouldLoadTopbarData && isAdminPath,
+  });
 
   const profileImage = isAdminPath
     ? adminData?.profileImage || null
     : profileData?.data?.profileImage || null;
 
   const { notifications, markAllRead, isMarkingAsRead } = useNotifications(
-    isAdminPath ? "admin" : "client"
+    isAdminPath ? "admin" : "client",
+    { enabled: shouldLoadTopbarData }
   );
 
   useEffect(() => {
-    if (!isAdminPath) {
+    if (!isAdminPath && shouldLoadTopbarData) {
       refetchProfile();
     }
-  }, [isAdminPath, refetchProfile]);
+  }, [isAdminPath, refetchProfile, shouldLoadTopbarData]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -182,24 +186,30 @@ const Topbar = ({ subtitle, toggle, title }) => {
               />
             </div>
 
-            <div
-              className="relative flex cursor-pointer items-center gap-1 rounded-full bg-slate-200 px-2 py-2 md:gap-2 md:px-3 md:py-3 lg:px-5"
-              onClick={() => setShowNotifications(true)}
-            >
-              <p className="hidden text-sm text-slate-800 lg:block">
-                {tc("notification")}
-              </p>
-              <FaBell size={16} className="cursor-pointer text-gray-500" />
-              {unreadCount > 0 ? (
-                <Badge
-                  className="!absolute -top-1 -right-1"
-                  color="red"
-                  circle
-                >
-                  {unreadCount}
-                </Badge>
-              ) : null}
-            </div>
+            {shouldLoadTopbarData ? (
+              <div
+                className="relative flex cursor-pointer items-center gap-1 rounded-full bg-slate-200 px-2 py-2 md:gap-2 md:px-3 md:py-3 lg:px-5"
+                onClick={() => setShowNotifications(true)}
+              >
+                <p className="hidden text-sm text-slate-800 lg:block">
+                  {tc("notification")}
+                </p>
+                <FaBell size={16} className="cursor-pointer text-gray-500" />
+                {unreadCount > 0 ? (
+                  <Badge
+                    className="!absolute -top-1 -right-1"
+                    color="red"
+                    circle
+                  >
+                    {unreadCount}
+                  </Badge>
+                ) : null}
+              </div>
+            ) : (
+              <div className="hidden lg:block rounded-full bg-slate-100 px-4 py-3 text-sm text-slate-500">
+                {tc("checkingYourSubscriptionStatus") || "Checking subscription..."}
+              </div>
+            )}
 
             <Menu shadow="md" width={200} position="top-end">
               <Menu.Target>
@@ -237,7 +247,7 @@ const Topbar = ({ subtitle, toggle, title }) => {
         </div>
       </div>
 
-      {showNotifications ? (
+      {showNotifications && shouldLoadTopbarData ? (
         <Suspense fallback={null}>
           <TopbarNotificationsPanel
             opened={showNotifications}

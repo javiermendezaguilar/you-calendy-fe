@@ -9,14 +9,17 @@ import { processInvitationFromUrl } from "./utils/invitationUtils";
 import GlobalBlockingLoader from "./components/common/GlobalBlockingLoader";
 import { isCurrentContextAuthenticated } from "./utils/authUtils";
 import { useLocation } from "react-router-dom";
-import { isLightweightPublicPath } from "./utils/routeRuntimeProfile";
+import {
+  isEarlyPrivateBootstrapPath,
+  isLightweightPublicPath,
+} from "./utils/routeRuntimeProfile";
 
 function App() {
   const location = useLocation();
   const shouldInitializeAuthManager = isCurrentContextAuthenticated();
-  const shouldRenderGlobalBlockingLoader = !isLightweightPublicPath(
-    location.pathname
-  );
+  const shouldRenderGlobalBlockingLoader =
+    !isLightweightPublicPath(location.pathname) &&
+    !isEarlyPrivateBootstrapPath(location.pathname);
 
   // Enable automatic page tracking
   usePageTracking();

@@ -4,7 +4,7 @@ import Topbar from "../components/layout/topbar";
 import { Outlet } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 
-const DashboardLayout = () => {
+const DashboardLayout = ({ subscriptionBootstrapPending = false }) => {
   const [opened, setOpened] = useState(false);
   const [collapsed, { toggle }] = useDisclosure();
 
@@ -18,7 +18,10 @@ const DashboardLayout = () => {
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Topbar toggle={() => setOpened(!opened)} />
+        <Topbar
+          toggle={() => setOpened(!opened)}
+          deferNonCriticalData={subscriptionBootstrapPending}
+        />
 
         <div className="py-3 flex-1">
           <Outlet />

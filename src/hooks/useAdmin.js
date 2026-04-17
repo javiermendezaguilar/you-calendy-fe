@@ -394,11 +394,12 @@ export const useSafeRestoreBackup = () => {
 };
 
 // Fetch admin profile data
-export const useAdminProfile = () => {
+export const useAdminProfile = (options = {}) => {
   return useQuery({
     queryKey: ["adminProfile"],
     queryFn: adminAPI.getAdminProfile,
     select: (data) => data.data.data, // Adjust based on actual API response structure
+    ...options,
   });
 };
 
