@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { cloneElement, isValidElement, useRef, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { isBarberAuthenticated, clearAuthData } from '../../utils/authUtils';
 import { useSubscriptionStatus } from '../../hooks/useSubscription';
 import BrandLoader from '../common/BrandLoader';
+import { isEarlyPrivateBootstrapPath } from '../../utils/routeRuntimeProfile';
 
 /**
  * BarberProtectedRoute
@@ -19,6 +20,7 @@ import BrandLoader from '../common/BrandLoader';
 const BarberProtectedRoute = ({ children }) => {
   const location = useLocation();
   const { data: subData, isLoading, isFetching, error, isSuccess } = useSubscriptionStatus();
+  const allowEarlyShellBootstrap = isEarlyPrivateBootstrapPath(location.pathname);
   
   // Check if barber is authenticated
   if (!isBarberAuthenticated()) {
@@ -37,9 +39,18 @@ const BarberProtectedRoute = ({ children }) => {
   }
 
   // Show full-screen loader ONLY before first resolution
-  const showInitialLoader = !initialResolvedRef.current && (isLoading || isFetching) && !hasResolved;
+  const showInitialLoader =
+    !allowEarlyShellBootstrap &&
+    !initialResolvedRef.current &&
+    (isLoading || isFetching) &&
+    !hasResolved;
   // After initial resolution, keep children mounted; show tiny overlay on background refetches
   const pendingRefetch = initialResolvedRef.current && isFetching && !isLoading;
+  const subscriptionBootstrapPending =
+    allowEarlyShellBootstrap &&
+    !initialResolvedRef.current &&
+    (isLoading || isFetching) &&
+    !hasResolved;
 
   // Debounce refetch overlay to avoid flicker on very fast background fetches
   const [showRefetchOverlay, setShowRefetchOverlay] = useState(false);
@@ -70,6 +81,15 @@ const BarberProtectedRoute = ({ children }) => {
 
   if (showInitialLoader) {
     return <BrandLoader label="Loading" fullscreen />;
+  }
+
+  const renderedChildren =
+    subscriptionBootstrapPending && isValidElement(children)
+      ? cloneElement(children, { subscriptionBootstrapPending: true })
+      : children;
+
+  if (subscriptionBootstrapPending) {
+    return renderedChildren;
   }
 
   // If status cannot be verified or indicates no valid access, redirect to subscription required page
@@ -107,7 +127,7 @@ const BarberProtectedRoute = ({ children }) => {
   // User is authenticated and has barber privileges
   return (
     <>
-      {children}
+      {renderedChildren}
       {showRefetchOverlay && (
         <div
           style={{
