@@ -1,0 +1,55 @@
+name: Runtime Measure
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "URL frontend a medir"
+        required: false
+        default: "https://staging.groomnest.com"
+        type: string
+      api_url:
+        description: "URL backend usada por el frontend"
+        required: false
+        default: "https://api.groomnest.com"
+        type: string
+      label:
+        description: "Etiqueta del entorno"
+        required: false
+        default: "staging"
+        type: string
+
+jobs:
+  runtime-measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Measure authenticated runtime
+        run: npm run perf:runtime
+        env:
+          RUNTIME_BASE_URL: ${{ inputs.base_url }}
+          RUNTIME_API_URL: ${{ inputs.api_url }}
+          SMOKE_BARBER_EMAIL: ${{ secrets.SMOKE_BARBER_EMAIL }}
+          SMOKE_BARBER_PASSWORD: ${{ secrets.SMOKE_BARBER_PASSWORD }}
+          SMOKE_VERCEL_PROTECTION_BYPASS: ${{ secrets.SMOKE_VERCEL_PROTECTION_BYPASS }}
+
+      - name: Upload runtime measurement artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-measure-${{ inputs.label }}
+          path: artifacts/runtime-measure.json
+          if-no-files-found: error

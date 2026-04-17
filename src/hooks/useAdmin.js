@@ -8,7 +8,7 @@ export const useAdminUserStats = () => {
     queryKey: ["admin", "user-stats"],
     queryFn: adminAPI.getUserStats,
     select: (data) => data.data,
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to fetch user statistics");
     },
   });
@@ -31,7 +31,7 @@ export const useAdminAppointmentTrends = () => {
     queryKey: ["admin", "appointments-trend"],
     queryFn: adminAPI.getMonthlyAppointmentTrends,
     select: (data) => data.data,
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to fetch appointment trends");
     },
   });
@@ -42,7 +42,7 @@ export const useAdminTopBarbers = () => {
     queryKey: ["admin", "top-barbers"],
     queryFn: adminAPI.getTopBarberTrend,
     select: (data) => data.data,
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to fetch top barbers data");
     },
   });
@@ -53,7 +53,7 @@ export const useAdminRevenueProjection = (params = {}) => {
     queryKey: ["admin", "revenue-projection", params],
     queryFn: () => adminAPI.getRevenueProjection(params),
     select: (data) => data.data,
-    onError: (error) => {
+    onError: () => {
       toast.error("Failed to fetch revenue projection data");
     },
   });
@@ -91,7 +91,7 @@ export const useUpdateBarberStatus = () => {
   
   return useMutation({
     mutationFn: ({ id, status }) => adminAPI.updateBarberStatus(id, status),
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(["admin", "barbers"]);
       queryClient.invalidateQueries(["admin", "user-stats"]);
       toast.success("Barber status updated successfully");
@@ -394,11 +394,12 @@ export const useSafeRestoreBackup = () => {
 };
 
 // Fetch admin profile data
-export const useAdminProfile = () => {
+export const useAdminProfile = (options = {}) => {
   return useQuery({
     queryKey: ["adminProfile"],
     queryFn: adminAPI.getAdminProfile,
     select: (data) => data.data.data, // Adjust based on actual API response structure
+    ...options,
   });
 };
 

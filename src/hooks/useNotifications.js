@@ -24,7 +24,7 @@ const markAllAsRead = async () => {
   return data.data;
 };
 
-export const useNotifications = (userType = null) => {
+export const useNotifications = (userType = null, options = {}) => {
   const queryClient = useQueryClient();
 
   // Unified auth detection across contexts.
@@ -44,7 +44,7 @@ export const useNotifications = (userType = null) => {
     if (!tokens.client && clientId && (path.startsWith('/client') || path.startsWith('/barber/profile/') || path.startsWith('/barber/'))) {
       clientLoose = true;
     }
-  } catch (_) {
+  } catch {
     /* noop */
   }
 
@@ -76,7 +76,8 @@ export const useNotifications = (userType = null) => {
   const { data: notificationsData, isLoading: isLoadingNotifications, refetch, ...rest } = useQuery({
     queryKey: ["notifications", userType],
     queryFn: () => fetchNotifications(userType),
-    enabled,
+    enabled: enabled && (options.enabled ?? true),
+    ...options,
   });
 
   const { mutate: markAllRead, isLoading: isMarkingAsRead } = useMutation({

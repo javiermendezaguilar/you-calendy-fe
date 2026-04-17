@@ -6,7 +6,7 @@ const getProfileSettings = async () => {
     return response.data;
 };
 
-export const useGetProfileSettings = () => {
+export const useGetProfileSettings = (options = {}) => {
     // Check if user data exists (authentication via cookies)
     const user = localStorage.getItem("user") || localStorage.getItem("adminUser");
     const isAuthenticated = !!user;
@@ -14,8 +14,9 @@ export const useGetProfileSettings = () => {
     return useQuery({
         queryKey: ["profile-settings"],
         queryFn: getProfileSettings,
-        enabled: isAuthenticated, // Only run query if user is authenticated
-        retry: 1
+        enabled: isAuthenticated && (options.enabled ?? true), // Only run query if user is authenticated
+        retry: 1,
+        ...options,
     });
 };
 

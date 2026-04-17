@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "smoke": "node scripts/run-smoke.mjs",
     "smoke:ci": "node scripts/run-smoke.mjs --skip-build",
-    "smoke:prod": "node scripts/run-smoke.mjs --remote --base-url=https://groomnest.com --api-url=https://api.groomnest.com"
+    "smoke:prod": "node scripts/run-smoke.mjs --remote --base-url=https://groomnest.com --api-url=https://api.groomnest.com",
+    "perf:runtime": "node scripts/measure-runtime.mjs",
+    "perf:trace": "node scripts/capture-runtime-trace.mjs"
   },
   "dependencies": {
     "@mantine/carousel": "^7.17.7",
