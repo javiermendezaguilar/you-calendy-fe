@@ -31,6 +31,20 @@ const useGetClients = (params = {}) => {
   });
 };
 
+const useGetClientsCount = (params = {}, options = {}) => {
+  return useQuery({
+    queryKey: ["getClientsCount", params],
+    queryFn: () => {
+      return axiosInstance.get("/business/clients/count", { params });
+    },
+    select: (data) => {
+      const responseData = data.data?.data;
+      return responseData?.pagination || responseData || data.data;
+    },
+    ...options,
+  });
+};
+
 // Hook to add a new client
 const useAddClient = () => {
   const queryClient = useQueryClient();
@@ -54,6 +68,7 @@ const useAddClient = () => {
       }
       
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
       if (variables.onSuccess) {
         variables.onSuccess(data);
       }
@@ -84,6 +99,7 @@ const useUpdateClient = (clientId) => {
     onSuccess: () => {
       toast.success(tc('clientUpdatedSuccessfully'));
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
       queryClient.invalidateQueries({ queryKey: ["getClient", clientId] });
     },
     onError: (error) => {
@@ -107,6 +123,7 @@ export const useUpdateClientStatus = () => {
       // Reuse existing success wording to avoid adding new i18n keys
       toast.success(tc('clientUpdatedSuccessfully'));
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || tc('failedToUpdateClient'));
@@ -127,6 +144,7 @@ const useDeleteClient = (options = {}) => {
     onSuccess: () => {
       toast.success(tc('clientDeletedSuccessfully'));
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
       if (options.onSuccess) {
         options.onSuccess();
       }
@@ -194,6 +212,7 @@ const useUploadClientsCSV = () => {
         toast.success(tc('csvUploadedSuccessfully'));
       }
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
     },
     onError: (error) => {
       toast.error(
@@ -208,10 +227,10 @@ const useResendInvitation = () => {
   const queryClient = useQueryClient();
   const { tc } = useBatchTranslation();
   return useMutation({
-    mutationFn: (clientId, options) => {
+    mutationFn: (clientId) => {
       return axiosInstance.post(`/business/clients/${clientId}/resend-invitation`);
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables) => {
       // Check if SMS was not sent due to insufficient credits
       const responseData = data?.data?.data;
       const smsNotSent = responseData?.smsStatus && !responseData.smsStatus.sent;
@@ -226,6 +245,7 @@ const useResendInvitation = () => {
         }
       }
       queryClient.invalidateQueries({ queryKey: ["getClients"] });
+      queryClient.invalidateQueries({ queryKey: ["getClientsCount"] });
     },
     onError: (error) => {
       toast.error(
@@ -349,9 +369,10 @@ const useUnblockClient = () => {
   });
 };
 
-export { 
-    useGetClients, 
-    useAddClient, 
+export {
+    useGetClients,
+    useGetClientsCount,
+    useAddClient,
     useUpdateClient, 
     useDeleteClient,
     useGetClientById,
