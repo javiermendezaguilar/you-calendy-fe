@@ -20,16 +20,12 @@ function App() {
   const shouldRenderGlobalBlockingLoader =
     !isLightweightPublicPath(location.pathname) &&
     !isEarlyPrivateBootstrapPath(location.pathname);
-  const shouldSkipInitialAuthValidation =
-    shouldInitializeAuthManager && isEarlyPrivateBootstrapPath(location.pathname);
 
   // Enable automatic page tracking
   usePageTracking();
   
   // Initialize authentication manager
-  useAuthManager(shouldInitializeAuthManager, {
-    skipInitialValidation: shouldSkipInitialAuthValidation,
-  });
+  useAuthManager(shouldInitializeAuthManager);
 
   // Process invitation token from URL on app load
   useEffect(() => {
