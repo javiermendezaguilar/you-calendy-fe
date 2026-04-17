@@ -61,7 +61,6 @@ const ClientManagement = () => {
     const params = {
       page: activePage,
       limit: itemsPerPage,
-      includeCount: false,
     };
 
     // Add search parameter
@@ -100,10 +99,7 @@ const ClientManagement = () => {
   }, [itemsPerPage, searchQuery, appliedFilters]);
 
   const { data: clientsData, isLoading, isError, error } = useGetClients(apiParams);
-  const {
-    data: countPagination,
-    isLoading: isCountLoading,
-  } = useGetClientsCount(countParams);
+  const { data: countPagination, isLoading: isCountLoading } = useGetClientsCount(countParams, { enabled: false });
   const { mutate: deleteClient, isLoading: isDeleting } = useDeleteClient({
     onSuccess: () => {
       closeDeleteModal();
@@ -114,9 +110,7 @@ const ClientManagement = () => {
 
   // Extract clients and pagination data from response
   const clients = clientsData?.clients || [];
-  const pagination = countPagination
-    ? { ...(clientsData?.pagination || {}), ...countPagination }
-    : clientsData?.pagination || { total: null, page: activePage, pages: null };
+  const pagination = clientsData?.pagination || { total: null, page: activePage, pages: null };
   const hasResolvedCount =
     Number.isFinite(pagination?.total) && Number.isFinite(pagination?.pages);
   const rangeStart = clients.length > 0 ? ((activePage - 1) * itemsPerPage) + 1 : 0;
