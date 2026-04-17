@@ -26,7 +26,13 @@ import { SortIcon, FilterIcon } from "../../components/common/Svgs";
 import { FiChevronDown } from "react-icons/fi";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useGetClients, useDeleteClient, useResendInvitation, useUpdateClientStatus } from "../../hooks/useClients";
+import {
+  useGetClients,
+  useGetClientsCount,
+  useDeleteClient,
+  useResendInvitation,
+  useUpdateClientStatus,
+} from "../../hooks/useClients";
 import ClientProfileSidebar from "../../components/client/ClientProfileSidebar";
 import BatchTranslationLoader from "../../components/barber/BatchTranslationLoader";
 import { useBatchTranslation } from "../../contexts/BatchTranslationContext";
@@ -55,6 +61,7 @@ const ClientManagement = () => {
     const params = {
       page: activePage,
       limit: itemsPerPage,
+      includeCount: false,
     };
 
     // Add search parameter
@@ -76,7 +83,27 @@ const ClientManagement = () => {
     return params;
   }, [activePage, itemsPerPage, searchQuery, appliedFilters, sortConfig]);
 
+  const countParams = useMemo(() => {
+    const params = {
+      limit: itemsPerPage,
+    };
+
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
+
+    if (appliedFilters.name) {
+      params.search = appliedFilters.name;
+    }
+
+    return params;
+  }, [itemsPerPage, searchQuery, appliedFilters]);
+
   const { data: clientsData, isLoading, isError, error } = useGetClients(apiParams);
+  const {
+    data: countPagination,
+    isLoading: isCountLoading,
+  } = useGetClientsCount(countParams);
   const { mutate: deleteClient, isLoading: isDeleting } = useDeleteClient({
     onSuccess: () => {
       closeDeleteModal();
@@ -87,7 +114,17 @@ const ClientManagement = () => {
 
   // Extract clients and pagination data from response
   const clients = clientsData?.clients || [];
-  const pagination = clientsData?.pagination || { total: 0, page: 1, pages: 1 };
+  const pagination = countPagination
+    ? { ...(clientsData?.pagination || {}), ...countPagination }
+    : clientsData?.pagination || { total: null, page: activePage, pages: null };
+  const hasResolvedCount =
+    Number.isFinite(pagination?.total) && Number.isFinite(pagination?.pages);
+  const rangeStart = clients.length > 0 ? ((activePage - 1) * itemsPerPage) + 1 : 0;
+  const rangeEnd = clients.length > 0
+    ? (hasResolvedCount
+      ? Math.min(activePage * itemsPerPage, pagination.total)
+      : rangeStart + clients.length - 1)
+    : 0;
 
   const openDeleteModal = (id) => {
     setClientToDelete(id);
@@ -356,26 +393,31 @@ const ClientManagement = () => {
           >
             <Text size="md" c="#323232" mb={{ base: "md", md: 0 }}>
               {clients.length > 0
-                ? `${(pagination.page - 1) * itemsPerPage + 1}-${Math.min(
-                    pagination.page * itemsPerPage,
-                    pagination.total
-                  )} ${tc('of')} ${pagination.total} ${tc('entries')}`
+                ? (hasResolvedCount
+                  ? `${rangeStart}-${rangeEnd} ${tc('of')} ${pagination.total} ${tc('entries')}`
+                  : `${rangeStart}-${rangeEnd} ${tc('entries')}`)
                 : `0 ${tc('entries')}`}
             </Text>
-            <Pagination
-              total={pagination.pages}
-              page={activePage}
-              onChange={setPage}
-              withEdges
-              styles={(theme) => ({
-                control: {
-                  width: '28px', height: '28px', minWidth: '28px', borderRadius: '6px', border: '1px solid #EAEAEA', backgroundColor: 'white', color: '#323232', fontWeight: 400,
-                  '&:not([data-disabled]):not([data-active]):hover': { backgroundColor: theme.colors.gray[1] },
-                  '&[data-first], &[data-last], &[data-next], &[data-previous]': { backgroundColor: '#738B4A', border: '1px solid #738B4A', color: 'white', '&:not([data-disabled]):hover': { backgroundColor: '#6A8838' }, '&[data-disabled]': { cursor: 'not-allowed' } },
-                  '&[data-active]': { backgroundColor: '#738B4A', border: '1px solid #738B4A', color: 'white', fontWeight: 700 },
-                },
-              })}
-            />
+            {hasResolvedCount ? (
+              <Pagination
+                total={pagination.pages}
+                page={activePage}
+                onChange={setPage}
+                withEdges
+                styles={(theme) => ({
+                  control: {
+                    width: '28px', height: '28px', minWidth: '28px', borderRadius: '6px', border: '1px solid #EAEAEA', backgroundColor: 'white', color: '#323232', fontWeight: 400,
+                    '&:not([data-disabled]):not([data-active]):hover': { backgroundColor: theme.colors.gray[1] },
+                    '&[data-first], &[data-last], &[data-next], &[data-previous]': { backgroundColor: '#738B4A', border: '1px solid #738B4A', color: 'white', '&:not([data-disabled]):hover': { backgroundColor: '#6A8838' }, '&[data-disabled]': { cursor: 'not-allowed' } },
+                    '&[data-active]': { backgroundColor: '#738B4A', border: '1px solid #738B4A', color: 'white', fontWeight: 700 },
+                  },
+                })}
+              />
+            ) : (
+              <Box h={28} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {isCountLoading ? <Loader size="sm" color="#738B4A" /> : null}
+              </Box>
+            )}
             <Group>
               <Select
                 value={itemsPerPage.toString()}
